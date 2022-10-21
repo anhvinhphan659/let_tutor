@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:let_tutor/components/common.dart';
-import 'package:let_tutor/utils/styles.dart';
+import 'package:let_tutor/utils/components/common.dart';
+import 'package:let_tutor/utils/styles/styles.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({Key? key}) : super(key: key);
@@ -10,45 +10,67 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final TextEditingController _emailTxtController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: LettutorAppbar(),
+    return LettutorContainer(
       body: Container(
-          child: Column(
-        children: [
-          Text(
-            'Đặt lại mật khẩu',
-            style: LettutorFontStyles.largeLabelText,
-          ),
-          Text(
-            'Vui lòng nhập email để tìm kiếm tài khoản của bạn.',
-            style: LettutorFontStyles.normalText,
-          ),
-          Text(
-            'Email',
-            style: LettutorFontStyles.normalText,
-          ),
-          TextField(
-            decoration: InputDecoration(
-                border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(6.0)))),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                color: LettutorColors.primaryColor,
-                borderRadius: const BorderRadius.all(Radius.circular(6.0))),
-            child: TextButton(
-              child: Text(
-                'Xác nhận',
-                style:
-                    LettutorFontStyles.normalText.copyWith(color: Colors.white),
-              ),
-              onPressed: () {},
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 35),
+          color: Colors.white,
+          alignment: Alignment.center,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    'Đặt lại mật khẩu',
+                    style: LettutorFontStyles.largeLabelText,
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    'Vui lòng nhập email để tìm kiếm tài khoản của bạn.',
+                    style: LettutorFontStyles.normalText,
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Email',
+                    style: LettutorFontStyles.normalText,
+                  ),
+                ),
+                TextField(
+                  controller: _emailTxtController,
+                  decoration: InputDecoration(
+                      border: const OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(6.0)))),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 24),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                      color: LettutorColors.primaryColor,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(6.0))),
+                  child: TextButton(
+                    child: Text(
+                      'Xác nhận',
+                      style: LettutorFontStyles.normalText
+                          .copyWith(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  ),
+                )
+              ],
             ),
-          )
-        ],
-      )),
+          )),
     );
   }
 }

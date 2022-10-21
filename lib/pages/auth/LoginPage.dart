@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:let_tutor/components/common.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/utils/components/common.dart';
+
 import 'package:let_tutor/pages/auth/ForgotPasswordPage.dart';
 import 'package:let_tutor/pages/auth/RegisterPage.dart';
-import 'package:let_tutor/utils/styles.dart';
+import 'package:let_tutor/pages/details/ListTeacherPage.dart';
+import 'package:let_tutor/utils/styles/styles.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -23,8 +25,8 @@ class _LoginPageState extends State<LoginPage> {
           builder: (context, constraints) {
             bool isSmallDevice = constraints.maxWidth >= 600;
 
-            var image = Image.network(
-              'https://sandbox.app.lettutor.com/static/media/login.8d01124a.png',
+            var image = Image.asset(
+              'assets/images/background_lettutor.png',
               fit: BoxFit.fitWidth,
             );
             var content = Container(
@@ -111,13 +113,17 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                         color: LettutorColors.primaryColor,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(6.0))),
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        PushTo(
+                            context: context,
+                            destination: const ListTeacherPage());
+                      },
                       child: Center(
                         child: Text(
                           "ĐĂNG NHẬP",
@@ -182,14 +188,18 @@ class _LoginPageState extends State<LoginPage> {
               return Container(
                 color: Colors.white,
                 padding: const EdgeInsets.all(30.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: ListView(
                   children: [
-                    Container(
-                        constraints: const BoxConstraints(maxWidth: 350),
-                        child: content),
-                    Expanded(child: image),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            constraints: const BoxConstraints(maxWidth: 350),
+                            child: content),
+                        Expanded(child: image),
+                      ],
+                    ),
                   ],
                 ),
               );

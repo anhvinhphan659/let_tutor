@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:let_tutor/components/common.dart';
+import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
-import 'package:let_tutor/utils/styles.dart';
+import 'package:let_tutor/utils/styles/styles.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -21,8 +21,8 @@ class _RegisterPageState extends State<RegisterPage> {
           builder: (context, constraints) {
             bool isSmallDevice = constraints.maxWidth >= 600;
 
-            var image = Image.network(
-              'https://sandbox.app.lettutor.com/static/media/login.8d01124a.png',
+            var image = Image.asset(
+              'assets/images/background_lettutor.png',
               fit: BoxFit.fitWidth,
             );
             var content = Container(
@@ -41,7 +41,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   Center(
                     child: Text(
-                      "Đăng nhập",
+                      "Đăng ký",
                       style: LettutorFontStyles.formTitle,
                     ),
                   ),
