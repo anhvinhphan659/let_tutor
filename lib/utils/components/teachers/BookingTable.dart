@@ -7,7 +7,8 @@ class BookingTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Table(
-      border: TableBorder.all(width: 1.0, color: Colors.black.withOpacity(0.85)),
+      border:
+          TableBorder.all(width: 1.0, color: Colors.black.withOpacity(0.85)),
       children: [
         TableRow(
           children: [

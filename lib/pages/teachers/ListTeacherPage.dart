@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/components/dropdown/gf_multiselect.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:let_tutor/pages/conference/VideoConference.dart';
 import 'package:let_tutor/utils/components/common.dart';
-import 'package:let_tutor/utils/components/details/SkillTag.dart';
-import 'package:let_tutor/utils/components/details/TeacherCard.dart';
+import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
+import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
 import 'package:let_tutor/utils/models/Teacher.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 
@@ -36,6 +37,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool hasLesson = true;
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -83,19 +85,54 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    'Bạn không có buổi học nào.',
+                    'You have no upcoming lesson.',
                     style: LettutorFontStyles.tagSelectedText.copyWith(
                       color: Colors.white,
                       fontSize: 30,
                     ),
                   ),
-                  Text(
-                    'Tổng số giờ bạn đã học là 2 giờ 55 phút',
-                    style: LettutorFontStyles.tagSelectedText.copyWith(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  )
+                  hasLesson
+                      ? Row(
+                          children: [
+                            Text(
+                              'Sun, 23 Oct 22 00:00 - 00:25',
+                              maxLines: 4,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                PushTo(
+                                    context: context,
+                                    destination: VideoConferencePage());
+                              },
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 6.4),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(40)),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: SvgPicture.asset(
+                                          'assets/icons/youtube.svg',
+                                          fit: BoxFit.fitWidth,
+                                        ),
+                                      ),
+                                      Text('Enter Lesson Room')
+                                    ],
+                                  )),
+                            )
+                          ],
+                        )
+                      : Text(
+                          'Total lesson time is 3 hours 20 minutes',
+                          style: LettutorFontStyles.tagSelectedText.copyWith(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        )
                 ],
               ),
             ),

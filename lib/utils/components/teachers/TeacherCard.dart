@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:let_tutor/pages/details/TeacherDetailPage.dart';
+import 'package:let_tutor/pages/teachers/TeacherDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
-import 'package:let_tutor/utils/components/details/SkillTag.dart';
-import 'package:let_tutor/utils/components/details/StateAvatar.dart';
+import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
+import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 import 'package:let_tutor/utils/models/Teacher.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 

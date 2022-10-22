@@ -3,6 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:let_tutor/pages/account/ProfilePage.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
 import 'package:let_tutor/pages/courses/ListCoursePage.dart';
+import 'package:let_tutor/pages/schedule/HistorySchedulePage.dart';
+import 'package:let_tutor/pages/schedule/ListSchedulePage.dart';
+import 'package:let_tutor/pages/teachers/LettutorPageProfile.dart';
+
 import 'package:let_tutor/utils/components/common.dart';
 
 class SettingPage extends StatelessWidget {
@@ -30,13 +34,17 @@ class SettingPage extends StatelessWidget {
       },
       {
         "icon": 'assets/icons/calendar-check.svg',
-        "function": () {},
+        "function": () {
+          PushTo(context: context, destination: ListSchedulePage());
+        },
         "screen": "Schedule",
       },
       {
         "icon": 'assets/icons/history.svg',
         "screen": "History",
-        "function": () {},
+        "function": () {
+          PushTo(context: context, destination: HistorySchedulePage());
+        },
       },
       {
         "icon": 'assets/icons/graduation-cap.svg',
@@ -53,7 +61,9 @@ class SettingPage extends StatelessWidget {
       {
         "icon": 'assets/icons/user-graduate.svg',
         "screen": "Become a tutor",
-        "function": () {},
+        "function": () {
+          PushTo(context: context, destination: LettutorPageProfile());
+        },
       },
       {
         "icon": 'assets/icons/sign-out-alt.svg',

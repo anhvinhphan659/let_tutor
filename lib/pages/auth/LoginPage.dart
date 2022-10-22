@@ -4,7 +4,7 @@ import 'package:let_tutor/utils/components/common.dart';
 
 import 'package:let_tutor/pages/auth/ForgotPasswordPage.dart';
 import 'package:let_tutor/pages/auth/RegisterPage.dart';
-import 'package:let_tutor/pages/details/ListTeacherPage.dart';
+import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 
 class LoginPage extends StatefulWidget {
