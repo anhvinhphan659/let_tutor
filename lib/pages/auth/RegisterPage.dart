@@ -16,7 +16,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: LettutorAppbar(),
+        appBar: LettutorAppBar(isLogin: false),
         body: LayoutBuilder(
           builder: (context, constraints) {
             bool isSmallDevice = constraints.maxWidth >= 600;

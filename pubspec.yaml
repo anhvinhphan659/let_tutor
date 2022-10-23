@@ -45,6 +45,7 @@ dependencies:
     git:
       url: https://github.com/dispersik/jitsi_meet_fork
       ref: master
+  font_awesome_flutter: ^10.2.1
 
 dev_dependencies:
   flutter_test:

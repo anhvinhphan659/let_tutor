@@ -20,10 +20,12 @@ class ListTeacherPage extends StatefulWidget {
 
 class _ListTeacherPageState extends State<ListTeacherPage> {
   var skills = [
-    "Tất cả",
-    "Tiếng Anh cho trẻ em",
-    "Tiếng Anh cho công việc",
-    "Giao tiếp",
+    "All",
+    "For Studing Abroad",
+    "English for Kid",
+    "English for Traveling",
+    "Conversational English",
+    "Business English",
     "STARTERS",
     "MOVERS",
     "FLYERS",
@@ -35,42 +37,13 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
   ];
   int _selectedSkill = 0;
 
+  var favoriteTecher = List.generate(sampleTeachers.length, (index) => false);
+
   @override
   Widget build(BuildContext context) {
     bool hasLesson = true;
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: Container(
-            height: 39,
-            child: SvgPicture.asset(
-              'assets/images/lettutor_logo.svg',
-              fit: BoxFit.fitWidth,
-            ),
-          ),
-          leadingWidth: 300,
-          actions: [
-            PopupMenuButton<int>(
-                offset: Offset(0, 60),
-                icon: Icon(Icons.flag_circle),
-                itemBuilder: (context) {
-                  return [
-                    PopupMenuItem<int>(
-                      child: Text('Option 1'),
-                      value: 1,
-                    ),
-                    PopupMenuItem<int>(
-                      child: Text('Option 2'),
-                      value: 2,
-                    ),
-                    PopupMenuItem<int>(
-                      child: Text('Option 3'),
-                      value: 3,
-                    ),
-                  ];
-                }),
-          ],
-        ),
+        appBar: LettutorAppBar(),
         body: ListView(
           children: [
             Container(
@@ -145,7 +118,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child: Text(
-                      "Tìm kiếm gia sư",
+                      "Find a tutor",
                       style: LettutorFontStyles.searchTitle,
                     ),
                   ),
@@ -156,7 +129,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                         margin: EdgeInsets.only(right: 5.0),
                         child: TextField(
                           decoration: InputDecoration(
-                            hintText: "Nhập tên gia sư...",
+                            hintText: "Enter tutor name...",
                             hintStyle: LettutorFontStyles.hintText,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 10.0),
@@ -220,7 +193,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                   size: 15,
                                   dropdownTitleTilePadding: EdgeInsets.zero,
                                   dropdownTitleTileText:
-                                      "Chọn quôc tịch gia sư",
+                                      "Select tutor nationality",
                                   dropdownUnderlineBorder: BorderSide(width: 0),
                                   dropdownTitleTileMargin:
                                       EdgeInsets.symmetric(horizontal: 4.0),
@@ -229,12 +202,12 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                       LettutorFontStyles.hintText,
                                   dropdownTitleTileTextStyle:
                                       LettutorFontStyles.hintText,
-                                  items: [
-                                    "Gia sư nước ngoài",
-                                    "Gia sư Việt Nam",
-                                    "Gia sư Tiếng Anh Bản Ngữ",
+                                  items: const [
+                                    "Foreign Tutor",
+                                    "Vietnamese Tutor",
+                                    "Native English Tutor",
                                   ],
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                       horizontal: 10.0, vertical: 4.0),
                                   margin: EdgeInsets.zero,
                                   onSelect: ((value) => print(value)))),
@@ -243,7 +216,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5.0),
                     child: Text(
-                      'Chọn thời gian dạy kèm có lịch trống:',
+                      'Select available tutoring time:',
                       style:
                           LettutorFontStyles.searchTitle.copyWith(fontSize: 14),
                     ),
@@ -254,7 +227,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                         width: 125,
                         child: TextField(
                             decoration: InputDecoration(
-                          hintText: "Chọn một ngày",
+                          hintText: "Select a day",
                           hintStyle: LettutorFontStyles.hintText,
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 10.0),
@@ -278,7 +251,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                         decoration: BoxDecoration(),
                         child: TextField(
                             decoration: InputDecoration(
-                          hintText: "Giờ bắt đầu ...",
+                          hintText: "Start time ...",
                           hintStyle: LettutorFontStyles.hintText,
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 10.0),
@@ -317,19 +290,22 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                       )
                     ],
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: LettutorColors.lightBlueColor),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _selectedSkill = 0;
-                        });
-                      },
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedSkill = 0;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: LettutorColors.lightBlueColor),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
                       child: Text(
-                        'Đặt lại bộ tìm kiếm',
+                        'Reset Filters',
                         style: LettutorFontStyles.descriptionText.copyWith(
                           color: LettutorColors.lightBlueColor,
                         ),
@@ -346,15 +322,23 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Gia sư được đề xuất',
+                    'Recommended Tutors',
                     style: LettutorFontStyles.searchTitle.copyWith(
                       fontSize: 25,
                     ),
                   ),
-                  Text("List gia sư"),
-                  ...sampleTeachers.map(
-                    (e) => TeacherCard(teacher: e),
-                  ),
+                  // Text("List gia sư"),
+                  ...List.generate(
+                      sampleTeachers.length,
+                      (index) => TeacherCard(
+                            teacher: sampleTeachers[index],
+                            isFavorite: favoriteTecher[index],
+                            onFavoriteTap: () {
+                              setState(() {
+                                favoriteTecher[index] = !favoriteTecher[index];
+                              });
+                            },
+                          )),
                   TeacherPagination(),
                 ],
               ),

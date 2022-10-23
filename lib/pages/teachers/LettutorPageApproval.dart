@@ -15,7 +15,7 @@ class _LettutorPageApprovalState extends State<LettutorPageApproval> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: LoginAppBar(context),
+      appBar: LettutorAppBar(),
       body: Container(
           color: Colors.white,
           child: ListView(

@@ -17,7 +17,7 @@ class _LettutorPageIntroductionState extends State<LettutorPageIntroduction> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: LoginAppBar(context),
+      appBar: LettutorAppBar(),
       body: Container(
         color: Colors.white,
         child: ListView(

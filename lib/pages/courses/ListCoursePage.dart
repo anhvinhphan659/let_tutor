@@ -106,29 +106,40 @@ class _ListCoursePageState extends State<ListCoursePage> {
     }
     // print(screenWidth);
     return Scaffold(
-      appBar: LoginAppBar(context),
+      appBar: LettutorAppBar(),
       body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
         color: Colors.white,
         child: ListView(
           shrinkWrap: true,
           children: [
             Row(
               children: [
-                SizedBox(
+                Container(
                   width: 100,
                   height: 100,
+                  margin: const EdgeInsets.only(right: 25),
                   child: SvgPicture.asset(
                     "assets/images/course.svg",
                     fit: BoxFit.fitHeight,
                   ),
                 ),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Discover Courses'),
+                    Text(
+                      'Discover Courses',
+                      style: LettutorFontStyles.h2Title,
+                    ),
                     Row(
                       children: [
                         const SizedBox(
-                            width: 200, height: 50, child: TextField()),
+                            width: 100,
+                            height: 50,
+                            child: TextField(
+                              decoration:
+                                  InputDecoration(border: OutlineInputBorder()),
+                            )),
                         IconButton(onPressed: () {}, icon: Icon(Icons.search))
                       ],
                     )
@@ -139,15 +150,23 @@ class _ListCoursePageState extends State<ListCoursePage> {
             Text(
               'LiveTutor has built the most quality, methodical and scientific courses in the fields of life for those who are in need of improving their knowledge of the fields.',
               maxLines: 4,
+              style: LettutorFontStyles.normalText,
             ),
             Wrap(
               children: [
                 ...List.generate(
                     searchOptionWidgets.length,
                     (index) => Container(
+                          // decoration: BoxDecoration(
+                          //     border: Border.all(
+                          //         width: 1.0,
+                          //         color: LettutorColors.lightGrayColor)),
                           padding: EdgeInsets.all(10),
                           constraints: BoxConstraints(maxWidth: 175),
                           child: GFMultiSelect(
+                            dropdownTitleTileBorder: Border.all(
+                                width: 1.0,
+                                color: LettutorColors.lightGrayColor),
                             dropdownTitleTilePadding: EdgeInsets.zero,
                             dropdownTitleTileMargin: EdgeInsets.zero,
                             items: searchOptionWidgets[index],

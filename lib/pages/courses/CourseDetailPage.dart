@@ -12,7 +12,7 @@ class CourseDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: LoginAppBar(context),
+      appBar: LettutorAppBar(),
       body: Container(
         color: Colors.white,
         child: ListView(children: [

@@ -23,7 +23,7 @@ class _ListSchedulePageState extends State<ListSchedulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: LoginAppBar(context),
+        appBar: LettutorAppBar(),
         body: Container(
           color: Colors.white,
           child: ListView(children: [

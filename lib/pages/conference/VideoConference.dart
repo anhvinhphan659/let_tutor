@@ -46,7 +46,7 @@ class _VideoConferencePageState extends State<VideoConferencePage> {
     double width = MediaQuery.of(context).size.width;
     return MaterialApp(
       home: Scaffold(
-        appBar: LoginAppBar(context),
+        appBar: LettutorAppBar(),
         body: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 16.0,

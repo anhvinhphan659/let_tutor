@@ -47,12 +47,17 @@ class CourseCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(course.courseName),
+                        Text(
+                          course.courseName,
+                          style: LettutorFontStyles.courseTitle,
+                        ),
                         Text(
                           course.description,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+                          style: LettutorFontStyles.courseContent,
                         ),
                       ],
                     ),

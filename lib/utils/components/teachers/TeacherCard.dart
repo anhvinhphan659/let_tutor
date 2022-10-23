@@ -10,7 +10,15 @@ import 'package:let_tutor/utils/styles/styles.dart';
 class TeacherCard extends StatelessWidget {
   final Teacher teacher;
   bool isActive;
-  TeacherCard({required this.teacher, this.isActive = false, Key? key})
+
+  bool isFavorite;
+  Function? onFavoriteTap;
+  TeacherCard(
+      {required this.teacher,
+      this.isActive = false,
+      this.isFavorite = false,
+      this.onFavoriteTap,
+      Key? key})
       : super(key: key);
 
   @override
@@ -101,8 +109,18 @@ class TeacherCard extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.favorite_border),
+                onPressed: () {
+                  onFavoriteTap!();
+                },
+                icon: isFavorite
+                    ? Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                      )
+                    : Icon(
+                        Icons.favorite_border,
+                        color: LettutorColors.blueColor,
+                      ),
               ),
             ],
           ),
@@ -138,16 +156,26 @@ class TeacherCard extends StatelessWidget {
               decoration: BoxDecoration(
                   border: Border.all(color: LettutorColors.lightBlueColor),
                   borderRadius: BorderRadius.circular(15.0)),
-              child: Row(
-                children: [
-                  Icon(Icons.calendar_month_rounded),
-                  Text(
-                    'Đặt lịch',
-                    style: LettutorFontStyles.descriptionText.copyWith(
+              child: GestureDetector(
+                onTap: () {
+                  PushTo(
+                      context: context,
+                      destination: TeacherDetailPage(teacher: teacher));
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_month_rounded,
                       color: LettutorColors.lightBlueColor,
                     ),
-                  ),
-                ],
+                    Text(
+                      'Book',
+                      style: LettutorFontStyles.descriptionText.copyWith(
+                        color: LettutorColors.lightBlueColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           ],

@@ -21,6 +21,8 @@ class TeacherDetailPage extends StatefulWidget {
 class _TeacherDetailPageState extends State<TeacherDetailPage> {
   late VideoPlayerController _controller;
 
+  bool isFavorite = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -30,226 +32,254 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
       ..initialize().then((_) {
         setState(() {});
       });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // mutes the video
+      _controller.setVolume(0);
+      // Plays the video once the widget is build and loaded.
+      _controller.play();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Container(
-          height: 39,
-          child: SvgPicture.asset(
-            'assets/images/lettutor_logo.svg',
-            fit: BoxFit.fitWidth,
-          ),
-        ),
-        leadingWidth: 300,
-        actions: [
-          PopupMenuButton<int>(
-              offset: Offset(0, 60),
-              icon: Icon(
-                Icons.flag_circle,
-                color: Colors.black,
-              ),
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem<int>(
-                    child: Text('Option 1'),
-                    value: 1,
-                  ),
-                  PopupMenuItem<int>(
-                    child: Text('Option 2'),
-                    value: 2,
-                  ),
-                  PopupMenuItem<int>(
-                    child: Text('Option 3'),
-                    value: 3,
-                  ),
-                ];
-              }),
-          IconButton(
-            onPressed: () {
-              PushTo(context: context, destination: SettingPage());
-            },
-            icon: Icon(
-              Icons.menu,
-              color: Colors.black,
-            ),
-          )
-        ],
-      ),
-      body: ListView(
-        children: [
-          Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    ClipOval(
-                      child: SizedBox.fromSize(
-                        size: const Size.fromRadius(35),
-                        child: Image.asset(
-                          'assets/images/teacher1.png',
-                          fit: BoxFit.cover,
+      appBar: LettutorAppBar(),
+      body: Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 35),
+        child: ListView(
+          children: [
+            Container(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      ClipOval(
+                        child: SizedBox.fromSize(
+                          size: const Size.fromRadius(35),
+                          child: Image.asset(
+                            'assets/images/teacher1.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 10, bottom: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.teacher.name,
-                        style: LettutorFontStyles.teacherNameText,
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            height: 18,
-                            width: 24,
-                            child: SvgPicture.network(
-                              widget.teacher.national_img,
-                              fit: BoxFit.cover,
+                    ],
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 10, bottom: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.teacher.name,
+                          style: LettutorFontStyles.teacherNameText,
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              height: 18,
+                              width: 24,
+                              child: SvgPicture.network(
+                                widget.teacher.national_img,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                          Text(
-                            widget.teacher.nationality,
-                            style: LettutorFontStyles.descriptionText.copyWith(
-                                color: const Color.fromRGBO(11, 34, 57, 1.0)),
-                          )
-                        ],
+                            Text(
+                              widget.teacher.nationality,
+                              style: LettutorFontStyles.contentText,
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            ...List.generate(
+                                widget.teacher.star,
+                                (index) => const Icon(
+                                      Icons.star,
+                                      color: Colors.yellow,
+                                      size: 12,
+                                    ))
+                          ],
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            ExpandableText(
+              widget.teacher.description,
+              expandText: 'More',
+              style: LettutorFontStyles.descriptionText
+                  .copyWith(color: Color.fromRGBO(120, 120, 120, 1.0)),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      isFavorite = !isFavorite;
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      isFavorite
+                          ? Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                            )
+                          : Icon(
+                              Icons.favorite_border,
+                              color: LettutorColors.blueColor,
+                            ),
+                      Text(
+                        'Favorite',
+                        style: LettutorFontStyles.normalText.copyWith(
+                            color: isFavorite
+                                ? Colors.red
+                                : LettutorColors.blueColor),
+                      )
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.report,
+                        color: LettutorColors.blueColor,
                       ),
-                      Row(
-                        children: [
-                          ...List.generate(
-                              widget.teacher.star,
-                              (index) => const Icon(
-                                    Icons.star,
-                                    color: Colors.yellow,
-                                    size: 12,
-                                  ))
-                        ],
+                      Text(
+                        'Report',
+                        style: LettutorFontStyles.normalText
+                            .copyWith(color: LettutorColors.blueColor),
+                      )
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        color: LettutorColors.blueColor,
+                      ),
+                      Text(
+                        'Reviews',
+                        style: LettutorFontStyles.normalText
+                            .copyWith(color: LettutorColors.blueColor),
                       )
                     ],
                   ),
                 )
               ],
             ),
-          ),
-          ExpandableText(
-            widget.teacher.description,
-            expandText: 'More',
-            style: LettutorFontStyles.descriptionText,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: () {},
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.favorite,
-                    ),
-                    Text('Favorite')
-                  ],
-                ),
+            SizedBox(
+              height: 300,
+              child: _controller.value.isInitialized
+                  ? AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      child: VideoPlayer(_controller),
+                    )
+                  : Container(),
+            ),
+            Text(
+              'Languages',
+              style: LettutorFontStyles.headerTeacherDetail,
+            ),
+            Wrap(
+              children: [
+                SkillTag(
+                  skill: 'English',
+                  selected: true,
+                )
+              ],
+            ),
+            Text(
+              'Specialties',
+              style: LettutorFontStyles.headerTeacherDetail,
+            ),
+            Wrap(
+              children: [
+                ...widget.teacher.tags.map((e) => SkillTag(
+                      skill: e,
+                      selected: true,
+                    ))
+              ],
+            ),
+            Text(
+              'Suggested courses',
+              style: LettutorFontStyles.headerTeacherDetail,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Basic Conversation Topics:',
+                    style: LettutorFontStyles.h5Text,
+                  ),
+                  TextButton(onPressed: () {}, child: Text('link'))
+                ],
               ),
-              InkWell(
-                onTap: () {},
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.report,
-                    ),
-                    Text('Report')
-                  ],
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Life in the Internet Age:',
+                    style: LettutorFontStyles.h5Text,
+                  ),
+                  TextButton(onPressed: () {}, child: Text('link'))
+                ],
               ),
-              InkWell(
-                onTap: () {},
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.star,
-                    ),
-                    Text('Reviews')
-                  ],
-                ),
-              )
-            ],
-          ),
-          Container(
-            height: 300,
-            child: _controller.value.isInitialized
-                ? AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: VideoPlayer(_controller),
-                  )
-                : Container(),
-          ),
-          Text('Languages'),
-          Wrap(
-            children: [
-              SkillTag(
-                skill: 'English',
-                selected: true,
-              )
-            ],
-          ),
-          Text('Specialties'),
-          Wrap(
-            children: [
-              ...widget.teacher.tags.map((e) => SkillTag(
-                    skill: e,
-                    selected: true,
-                  ))
-            ],
-          ),
-          Text('Suggested courses'),
-          Row(
-            children: [
-              Text('Basic Conversation Topics:'),
-              TextButton(onPressed: () {}, child: Text('link'))
-            ],
-          ),
-          Row(
-            children: [
-              Text('Life in the Internet Age:'),
-              TextButton(onPressed: () {}, child: Text('link'))
-            ],
-          ),
-          Text('Interests'),
-          Text(
-            ' I loved the weather, the scenery and the laid-back lifestyle of the locals.',
-            maxLines: 4,
-          ),
-          Text('Teaching experience'),
-          Text(
-            'I have more than 10 years of teaching english experience',
-            maxLines: 4,
-          ),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Today'),
+            ),
+            Text(
+              'Interests',
+              style: LettutorFontStyles.headerTeacherDetail,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 7, left: 15.0),
+              child: Text(
+                ' I loved the weather, the scenery and the laid-back lifestyle of the locals.',
+                maxLines: 4,
+                style: LettutorFontStyles.contentText,
               ),
-              TextButton(onPressed: () {}, child: Text('<')),
-              TextButton(onPressed: () {}, child: Text('>')),
-              Text('Oct  -  Nov, 2022')
-            ],
-          ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(width: 500, child: BookingTable()))
-        ],
+            ),
+            Text(
+              'Teaching experience',
+              style: LettutorFontStyles.headerTeacherDetail,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 7, left: 15.0),
+              child: Text(
+                'I have more than 10 years of teaching english experience',
+                style: LettutorFontStyles.contentText,
+                maxLines: 4,
+              ),
+            ),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Today'),
+                ),
+                TextButton(onPressed: () {}, child: Text('<')),
+                TextButton(onPressed: () {}, child: Text('>')),
+                Text('Oct  -  Nov, 2022')
+              ],
+            ),
+            SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(width: 500, child: BookingTable()))
+          ],
+        ),
       ),
     );
   }

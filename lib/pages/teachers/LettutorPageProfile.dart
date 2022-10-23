@@ -25,7 +25,7 @@ class _LettutorPageProfileState extends State<LettutorPageProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: LoginAppBar(context),
+      appBar: LettutorAppBar(),
       body: Container(
         color: Colors.white,
         child: ListView(

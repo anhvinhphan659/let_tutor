@@ -16,6 +16,14 @@ class LettutorColors {
 }
 
 class LettutorFontStyles {
+//common
+  static TextStyle h2Title = TextStyle(
+      fontSize: 25,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Poppins, sans-serif',
+      color: Colors.black.withOpacity(0.85),
+      height: 1.45);
+  //-----------------------------------------
   static TextStyle normalText = TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.normal,
@@ -86,5 +94,42 @@ class LettutorFontStyles {
       fontWeight: FontWeight.normal,
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(0, 0, 0, 0.85),
+      height: 1.45);
+
+//---------------------------------------//
+//detail pages
+  static TextStyle headerTeacherDetail = const TextStyle(
+      fontSize: 17,
+      fontWeight: FontWeight.w500,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(0, 0, 0, 0.85),
+      height: 1.45);
+  static TextStyle contentText = const TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(120, 120, 120, 1.0),
+      height: 1.45);
+  static TextStyle h5Text = const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(0, 0, 0, 0.85),
+      height: 1.45);
+
+  //---------------------------------------//
+//detail pages
+  static TextStyle courseTitle = const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(0, 0, 0, 0.85),
+      height: 1.45);
+
+  static TextStyle courseContent = const TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(120, 120, 120, 1.0),
       height: 1.45);
 }
