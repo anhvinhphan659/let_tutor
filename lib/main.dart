@@ -1,8 +1,32 @@
+import 'dart:io';
+
+import 'package:country_codes/country_codes.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:let_tutor/handler/api_handler.dart';
+import 'package:let_tutor/handler/auth/auth_controller.dart';
+import 'package:let_tutor/handler/data_handler.dart';
+import 'package:let_tutor/handler/http_override.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
 
-void main() {
+void main() async {
+  await initHandler();
   runApp(const MyApp());
+}
+
+Future initHandler() async {
+  HttpOverrides.global = MyHttpOverrides();
+  WidgetsFlutterBinding.ensureInitialized();
+  await CountryCodes.init();
+
+  await DataHandler.initial();
+
+  // ByteData data =
+  //     await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
+  // SecurityContext.defaultContext
+  //     .setTrustedCertificatesBytes(data.buffer.asUint8List());
+  // await ApiHandler.initial();
 }
 
 class MyApp extends StatelessWidget {
@@ -27,19 +51,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return LoginPage();

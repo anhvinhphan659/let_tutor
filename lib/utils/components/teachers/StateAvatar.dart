@@ -27,9 +27,11 @@ class StateAvatar extends StatelessWidget {
     return Stack(
       children: [
         ClipOval(
-          child: SizedBox.fromSize(
-            size: Size.fromRadius(backgroundRadius),
-            child: child,
+          child: Container(
+            height: backgroundRadius * 2,
+            width: backgroundRadius * 2,
+            color: Colors.white,
+            child: Center(child: child),
           ),
         ),
         displayTop

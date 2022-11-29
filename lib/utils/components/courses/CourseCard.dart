@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:let_tutor/pages/courses/CourseDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/models/Course.dart';
+
 import 'package:let_tutor/utils/styles/styles.dart';
 
 class CourseCard extends StatelessWidget {

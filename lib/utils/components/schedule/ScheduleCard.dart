@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 import 'package:let_tutor/utils/models/Schedule.dart';
-import 'package:let_tutor/utils/models/Teacher.dart';
+
 import 'package:let_tutor/utils/styles/styles.dart';
 
 class ScheduleCard extends StatefulWidget {
@@ -57,25 +57,25 @@ class _ScheduleCardState extends State<ScheduleCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        teacher.name,
-                        style: LettutorFontStyles.teacherNameText,
-                      ),
+                      // Text(
+                      //   teacher.name,
+                      //   style: LettutorFontStyles.teacherNameText,
+                      // ),
                       Row(
                         children: [
                           Container(
                             height: 18,
                             width: 24,
-                            child: SvgPicture.network(
-                              teacher.national_img,
-                              fit: BoxFit.cover,
-                            ),
+                            // child: SvgPicture.network(
+                            //   teacher.national_img,
+                            //   fit: BoxFit.cover,
+                            // ),
                           ),
-                          Text(
-                            teacher.nationality,
-                            style: LettutorFontStyles.descriptionText.copyWith(
-                                color: const Color.fromRGBO(11, 34, 57, 1.0)),
-                          )
+                          // Text(
+                          // teacher.nationality,
+                          // style: LettutorFontStyles.descriptionText.copyWith(
+                          // color: const Color.fromRGBO(11, 34, 57, 1.0)),
+                          // )
                         ],
                       ),
                       Row(

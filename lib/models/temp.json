@@ -1,0 +1,51 @@
+{
+    "user": {
+        "id": "cb9e7deb-3382-48db-b07c-90acf52f541c",
+        "email": "phhai@ymail.com",
+        "name": "Phhai",
+        "avatar": "https://www.alliancerehabmed.com/wp-content/uploads/icon-avatar-default.png",
+        "country": "VN",
+        "phone": "842499996508",
+        "roles": [
+            "student",
+            "CHANGE_PASSWORD"
+        ],
+        "language": null,
+        "birthday": "1999-06-01",
+        "isActivated": true,
+        "walletInfo": {
+            "id": "102ef671-a249-4d19-852e-ea23016d7d34",
+            "userId": "cb9e7deb-3382-48db-b07c-90acf52f541c",
+            "amount": "0",
+            "isBlocked": false,
+            "createdAt": "2021-12-18T03:55:53.522Z",
+            "updatedAt": "2021-12-18T03:55:53.522Z",
+            "bonus": 0
+        },
+        "courses": [],
+        "requireNote": null,
+        "level": "INTERMEDIATE",
+        "learnTopics": [
+            {
+                "id": 3,
+                "key": "english-for-kids",
+                "name": "English for Kids"
+            }
+        ],
+        "testPreparations": [],
+        "isPhoneActivated": true,
+        "timezone": 7,
+        "studySchedule": null,
+        "canSendMessage": false
+    },
+    "tokens": {
+        "access": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYjllN2RlYi0zMzgyLTQ4ZGItYjA3Yy05MGFjZjUyZjU0MWMiLCJpYXQiOjE2Njk2NDAwNjYsImV4cCI6MTY2OTcyNjQ2NiwidHlwZSI6ImFjY2VzcyJ9.csDPfRQaFLPyvkJiHV1AhSq50DkGwaIDubQtbSZ0Oi8",
+            "expires": "2022-11-29T12: 54: 26.749Z"
+        },
+        "refresh": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYjllN2RlYi0zMzgyLTQ4ZGItYjA3Yy05MGFjZjUyZjU0MWMiLCJpYXQiOjE2Njk2NDAwNjYsImV4cCI6MTY3MjIzMjA2NiwidHlwZSI6InJlZnJlc2gifQ.CF1rQ2oPO6D6GiABr-krZz3j-eJ_DzTqcfqbwPUxNJ0",
+            "expires": "2022-12-28T12: 54: 26.749Z"
+        }
+    }
+}

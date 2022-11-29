@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 
-var skillTags = [
-  "For Studing Abroad",
-  "English for Kid",
-  "English for Traveling",
-  "Conversational English",
-  "Business English",
-  "STARTERS",
-  "MOVERS",
-  "FLYERS",
-  "KET",
-  "PET",
-  "IELTS",
-  "TOEFL",
-  "TOEIC",
-];
+var skillTags = {
+  "english-for-studing-abroad": "For Studing Abroad",
+  "english-for-kids": "English for Kid",
+  "english-for-traveling": "English for Traveling",
+  "conversational-english": "Conversational English",
+  "business-english": "Business English",
+  "starters": "STARTERS",
+  "movers": "MOVERS",
+  "flyers": "FLYERS",
+  "ket": "KET",
+  "pet": "PET",
+  "ielts": "IELTS",
+  "toefl": "TOEFL",
+  "toeic": "TOEIC",
+};
 
 class SkillTag extends StatelessWidget {
   String skill;

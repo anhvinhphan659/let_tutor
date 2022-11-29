@@ -21,7 +21,7 @@ class _LettutorPageProfileState extends State<LettutorPageProfile> {
   var levelOptions = ["Beginner", "Intermediate", "Advanced"];
   int selectedLevel = -1;
 
-  var skillSelected = {for (var s in skillTags) s: false};
+  var skillSelected = {for (var s in skillTags.keys) s: false};
   @override
   Widget build(BuildContext context) {
     return Scaffold(

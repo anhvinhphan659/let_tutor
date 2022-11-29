@@ -1,4 +1,4 @@
-import 'package:let_tutor/utils/models/Teacher.dart';
+import 'package:let_tutor/models/teacher.dart';
 
 class Schedule {
   String date;

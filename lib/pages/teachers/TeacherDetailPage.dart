@@ -1,12 +1,15 @@
 import 'package:expandable_text/expandable_text.dart';
+import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/models/teacher.dart';
 import 'package:let_tutor/pages/account/SettingPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/BookingTable.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
-import 'package:let_tutor/utils/models/Teacher.dart';
+
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 import 'package:video_player/video_player.dart';
 
 class TeacherDetailPage extends StatefulWidget {
@@ -20,26 +23,34 @@ class TeacherDetailPage extends StatefulWidget {
 
 class _TeacherDetailPageState extends State<TeacherDetailPage> {
   late VideoPlayerController _controller;
+  late FlickManager flickManager;
+  late Teacher teacher;
 
   bool isFavorite = false;
+  bool isLoading = true;
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
-    _controller = VideoPlayerController.network(
-        'https://api.app.lettutor.com/video/4d54d3d7-d2a9-42e5-97a2-5ed38af5789avideo1627913015871.mp4')
-      ..initialize().then((_) {
-        setState(() {});
+    teacher = widget.teacher;
+
+    _controller = VideoPlayerController.network(teacher.video ?? "");
+    _controller.initialize().then((value) {
+      setState(() {
+        flickManager = FlickManager(videoPlayerController: _controller);
+        isLoading = false;
       });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // mutes the video
-      _controller.setVolume(0);
-      // Plays the video once the widget is build and loaded.
-      _controller.play();
     });
+
+    super.initState();
   }
 
+  @override
+  void dispose() {
+    flickManager.dispose();
+    super.dispose();
+  }
+
+  var initialDate = DateTime.now();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,13 +78,13 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                     ],
                   ),
                   Container(
-                    padding: EdgeInsets.only(left: 10, bottom: 10),
+                    padding: const EdgeInsets.only(left: 10, bottom: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          widget.teacher.name,
+                          teacher.name ?? "",
                           style: LettutorFontStyles.teacherNameText,
                         ),
                         Row(
@@ -82,25 +93,37 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                               height: 18,
                               width: 24,
                               child: SvgPicture.network(
-                                widget.teacher.national_img,
+                                'https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.3/flags/4x3/${(teacher.country ?? "VN").toLowerCase()}.svg',
                                 fit: BoxFit.cover,
                               ),
                             ),
                             Text(
-                              widget.teacher.nationality,
-                              style: LettutorFontStyles.contentText,
+                              teacher.country ?? "",
+                              style: LettutorFontStyles.descriptionText
+                                  .copyWith(
+                                      color: const Color.fromRGBO(
+                                          11, 34, 57, 1.0)),
                             )
                           ],
                         ),
                         Row(
                           children: [
                             ...List.generate(
-                                widget.teacher.star,
-                                (index) => const Icon(
-                                      Icons.star,
-                                      color: Colors.yellow,
-                                      size: 12,
-                                    ))
+                              (teacher.rating ?? 0.0).floor(),
+                              (_) => const Icon(
+                                Icons.star,
+                                color: Colors.yellow,
+                                size: 12,
+                              ),
+                            ),
+                            ...List.generate(
+                              (5 - (teacher.rating ?? 0.0).floor()),
+                              (_) => const Icon(
+                                Icons.star,
+                                color: Colors.grey,
+                                size: 12,
+                              ),
+                            ),
                           ],
                         )
                       ],
@@ -110,7 +133,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
               ),
             ),
             ExpandableText(
-              widget.teacher.description,
+              widget.teacher.bio ?? "",
               expandText: 'More',
               style: LettutorFontStyles.descriptionText
                   .copyWith(color: Color.fromRGBO(120, 120, 120, 1.0)),
@@ -150,7 +173,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                   child: Column(
                     children: [
                       Icon(
-                        Icons.report,
+                        Icons.report_rounded,
                         color: LettutorColors.blueColor,
                       ),
                       Text(
@@ -166,7 +189,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                   child: Column(
                     children: [
                       Icon(
-                        Icons.star,
+                        Icons.star_outline,
                         color: LettutorColors.blueColor,
                       ),
                       Text(
@@ -182,11 +205,17 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
             SizedBox(
               height: 300,
               child: _controller.value.isInitialized
-                  ? AspectRatio(
-                      aspectRatio: _controller.value.aspectRatio,
-                      child: VideoPlayer(_controller),
+                  ? FlickVideoPlayer(
+                      flickManager: flickManager,
+                      flickVideoWithControls: const FlickVideoWithControls(
+                        videoFit: BoxFit.fitHeight,
+                        controls: FlickPortraitControls(),
+                      ),
                     )
-                  : Container(),
+                  : const Center(
+                      child: CircularProgressIndicator(
+                      color: Colors.grey,
+                    )),
             ),
             Text(
               'Languages',
@@ -194,10 +223,10 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
             ),
             Wrap(
               children: [
-                SkillTag(
-                  skill: 'English',
-                  selected: true,
-                )
+                ...(teacher.languages ?? "").split(",").map((e) => SkillTag(
+                      skill: getCountryNameFromCode(e) ?? "",
+                      selected: true,
+                    ))
               ],
             ),
             Text(
@@ -206,8 +235,8 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
             ),
             Wrap(
               children: [
-                ...widget.teacher.tags.map((e) => SkillTag(
-                      skill: e,
+                ...(teacher.specialties ?? "").split(",").map((e) => SkillTag(
+                      skill: skillTags[e] ?? "",
                       selected: true,
                     ))
               ],
@@ -247,7 +276,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 7, left: 15.0),
               child: Text(
-                ' I loved the weather, the scenery and the laid-back lifestyle of the locals.',
+                teacher.interests ?? "",
                 maxLines: 4,
                 style: LettutorFontStyles.contentText,
               ),
@@ -259,7 +288,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 7, left: 15.0),
               child: Text(
-                'I have more than 10 years of teaching english experience',
+                teacher.experience ?? "",
                 style: LettutorFontStyles.contentText,
                 maxLines: 4,
               ),
@@ -267,17 +296,41 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      initialDate = DateTime.now();
+                      print('New inital: ' + initialDate.toString());
+                    });
+                  },
                   child: Text('Today'),
                 ),
-                TextButton(onPressed: () {}, child: Text('<')),
-                TextButton(onPressed: () {}, child: Text('>')),
-                Text('Oct  -  Nov, 2022')
+                TextButton(
+                    onPressed: () {
+                      setState(() {
+                        initialDate =
+                            initialDate.subtract(const Duration(days: 7));
+                        print('New inital: ' + initialDate.toString());
+                      });
+                    },
+                    child: Text('<')),
+                TextButton(
+                    onPressed: () {
+                      setState(() {
+                        initialDate = initialDate.add(const Duration(days: 7));
+                        print('New inital: ' + initialDate.toString());
+                      });
+                    },
+                    child: Text('>')),
+                Text(getDisplayTitle(initialDate))
               ],
             ),
             SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Container(width: 500, child: BookingTable()))
+                child: Container(
+                    width: 500,
+                    child: BookingTable(
+                      initialDate: initialDate,
+                    )))
           ],
         ),
       ),

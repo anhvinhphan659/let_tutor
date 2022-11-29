@@ -46,6 +46,12 @@ dependencies:
       url: https://github.com/dispersik/jitsi_meet_fork
       ref: master
   font_awesome_flutter: ^10.2.1
+  intl: ^0.17.0
+  flick_video_player: ^0.5.0
+  dio: ^4.0.6
+  http: ^0.13.5
+  shared_preferences: ^2.0.15
+  country_codes: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +79,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/ca/
     
 
   # An image asset can refer to one or more resolution-specific "variants", see

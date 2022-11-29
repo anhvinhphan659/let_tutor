@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/handler/auth/auth_controller.dart';
 import 'package:let_tutor/utils/components/common.dart';
 
 import 'package:let_tutor/pages/auth/ForgotPasswordPage.dart';
@@ -119,10 +120,15 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(6.0))),
                     child: TextButton(
-                      onPressed: () {
-                        PushTo(
-                            context: context,
-                            destination: const ListTeacherPage());
+                      onPressed: () async {
+                        var loginStatus = await AuthController.login(
+                            _usernameTxtController.text,
+                            _passwordTxtController.text);
+                        if (loginStatus == LOGIN_STATUS.SUCCESSFUL) {
+                          PushTo(
+                              context: context,
+                              destination: const ListTeacherPage());
+                        }
                       },
                       child: Center(
                         child: Text(

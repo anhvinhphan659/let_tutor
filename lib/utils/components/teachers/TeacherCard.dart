@@ -1,11 +1,14 @@
+import 'package:country_codes/country_codes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/models/teacher.dart';
 import 'package:let_tutor/pages/teachers/TeacherDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
-import 'package:let_tutor/utils/models/Teacher.dart';
+
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 class TeacherCard extends StatelessWidget {
   final Teacher teacher;
@@ -23,6 +26,19 @@ class TeacherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget avatarWidget = DefaultAvatar(teacherName: teacher.name ?? "");
+    if (teacher.avatar != null) {
+      if (teacher.avatar!.indexOf("avatar-default") < 0) {
+        avatarWidget = Image.network(
+          teacher.avatar!,
+          fit: BoxFit.fitHeight,
+        );
+      }
+    }
+    String countryName = "";
+    if (teacher.country != null) {
+      countryName = getCountryNameFromCode(teacher.country!) ?? "";
+    }
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -33,8 +49,8 @@ class TeacherCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(
-          height: 80,
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 200),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -45,67 +61,76 @@ class TeacherCard extends StatelessWidget {
                       context: context,
                       destination: TeacherDetailPage(teacher: teacher));
                 },
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        StateAvatar(
-                          foregroundRadius: 5,
-                          backgroundRadius: 30,
-                          dx: 46,
-                          child: Image.asset(
-                            'assets/images/teacher1.png',
-                            fit: BoxFit.fitHeight,
-                          ),
-                          displayTop: true,
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 10, bottom: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * .55),
+                  child: Wrap(
+                    children: [
+                      Column(
                         children: [
-                          Text(
-                            teacher.name,
-                            style: LettutorFontStyles.teacherNameText,
+                          StateAvatar(
+                            foregroundRadius: 5,
+                            backgroundRadius: 30,
+                            dx: 46,
+                            displayTop: teacher.isActivated ?? false,
+                            child: avatarWidget,
                           ),
-                          Row(
-                            children: [
-                              Container(
-                                height: 18,
-                                width: 24,
-                                child: SvgPicture.network(
-                                  teacher.national_img,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Text(
-                                teacher.nationality,
-                                style: LettutorFontStyles.descriptionText
-                                    .copyWith(
-                                        color: const Color.fromRGBO(
-                                            11, 34, 57, 1.0)),
-                              )
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              ...List.generate(
-                                  teacher.star,
-                                  (index) => const Icon(
-                                        Icons.star,
-                                        color: Colors.yellow,
-                                        size: 12,
-                                      ))
-                            ],
-                          )
                         ],
                       ),
-                    )
-                  ],
+                      Container(
+                        padding: const EdgeInsets.only(left: 10, bottom: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              teacher.name ?? "",
+                              style: LettutorFontStyles.teacherNameText,
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  height: 18,
+                                  width: 24,
+                                  child: SvgPicture.network(
+                                    'https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.3/flags/4x3/${(teacher.country ?? "VN").toLowerCase()}.svg',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Text(
+                                  countryName,
+                                  style: LettutorFontStyles.descriptionText
+                                      .copyWith(
+                                          color: const Color.fromRGBO(
+                                              11, 34, 57, 1.0)),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                ...List.generate(
+                                  (teacher.rating ?? 0.0).floor(),
+                                  (_) => const Icon(
+                                    Icons.star,
+                                    color: Colors.yellow,
+                                    size: 12,
+                                  ),
+                                ),
+                                ...List.generate(
+                                  (5 - (teacher.rating ?? 0.0).floor()),
+                                  (_) => const Icon(
+                                    Icons.star,
+                                    color: Colors.grey,
+                                    size: 12,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
               IconButton(
@@ -125,15 +150,17 @@ class TeacherCard extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(
-          height: 80,
-          child: Wrap(
-            children: [
-              ...teacher.tags.map((e) => SkillTag(
-                    skill: e,
-                    selected: true,
-                  ))
-            ],
+        ClipRect(
+          child: SizedBox(
+            height: 70,
+            child: Wrap(
+              children: [
+                ...(teacher.specialties ?? "").split(",").map((e) => SkillTag(
+                      skill: skillTags[e] ?? "",
+                      selected: true,
+                    ))
+              ],
+            ),
           ),
         ),
         SizedBox(
@@ -141,7 +168,7 @@ class TeacherCard extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.zero,
             child: Text(
-              teacher.description,
+              teacher.bio ?? "",
               overflow: TextOverflow.ellipsis,
               maxLines: 4,
             ),
@@ -181,6 +208,26 @@ class TeacherCard extends StatelessWidget {
           ],
         )
       ]),
+    );
+  }
+
+  Widget DefaultAvatar({String teacherName = "", int size = 20}) {
+    var names = teacherName.split(" ");
+    while (names.length < 2) {
+      names.add(" ");
+    }
+    String defaultString =
+        names[0].toUpperCase()[0] + names[1].toUpperCase()[0];
+    return Container(
+      height: 60,
+      width: 60,
+      color: Colors.blue,
+      child: Center(
+        child: Text(
+          defaultString,
+          style: LettutorFontStyles.defaultAvatarText,
+        ),
+      ),
     );
   }
 }

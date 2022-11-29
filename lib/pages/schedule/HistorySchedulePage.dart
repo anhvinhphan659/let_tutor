@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/schedule/HistoryScheduleCard.dart';
 import 'package:let_tutor/utils/models/Schedule.dart';
-import 'package:let_tutor/utils/models/Teacher.dart';
 
 class HistorySchedulePage extends StatefulWidget {
   const HistorySchedulePage({Key? key}) : super(key: key);
@@ -14,26 +13,26 @@ class HistorySchedulePage extends StatefulWidget {
 
 class _HistorySchedulePageState extends State<HistorySchedulePage> {
   var listSchedules = [
-    Schedule(
-        teacher: sampleTeachers[0],
-        date: 'Thu, 30 Sep 21',
-        startTime: '00:00',
-        endTime: '00:30'),
-    Schedule(
-        teacher: sampleTeachers[0],
-        date: 'Sat, 25 Sep 21',
-        startTime: '20:00',
-        endTime: '20:30'),
-    Schedule(
-        teacher: sampleTeachers[0],
-        date: 'Thu, 23 Sep 21',
-        startTime: '21:00',
-        endTime: '21:30'),
-    Schedule(
-        teacher: sampleTeachers[0],
-        date: 'Wed, 22 Sep 21',
-        startTime: '00:00',
-        endTime: '00:30'),
+    // Schedule(
+    //     teacher: sampleTeachers[0],
+    //     date: 'Thu, 30 Sep 21',
+    //     startTime: '00:00',
+    //     endTime: '00:30'),
+    // Schedule(
+    //     teacher: sampleTeachers[0],
+    //     date: 'Sat, 25 Sep 21',
+    //     startTime: '20:00',
+    //     endTime: '20:30'),
+    // Schedule(
+    //     teacher: sampleTeachers[0],
+    //     date: 'Thu, 23 Sep 21',
+    //     startTime: '21:00',
+    //     endTime: '21:30'),
+    // Schedule(
+    //     teacher: sampleTeachers[0],
+    //     date: 'Wed, 22 Sep 21',
+    //     startTime: '00:00',
+    //     endTime: '00:30'),
   ];
   @override
   Widget build(BuildContext context) {

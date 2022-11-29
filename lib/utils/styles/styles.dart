@@ -97,7 +97,7 @@ class LettutorFontStyles {
       height: 1.45);
 
 //---------------------------------------//
-//detail pages
+//teacher pages
   static TextStyle headerTeacherDetail = const TextStyle(
       fontSize: 17,
       fontWeight: FontWeight.w500,
@@ -116,9 +116,14 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(0, 0, 0, 0.85),
       height: 1.45);
-
+  static TextStyle defaultAvatarText = const TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Roboto, sans-serif',
+      color: Colors.white,
+      height: 1.45);
   //---------------------------------------//
-//detail pages
+//course pages
   static TextStyle courseTitle = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w600,

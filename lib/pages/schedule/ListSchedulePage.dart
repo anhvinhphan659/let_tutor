@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/schedule/ScheduleCard.dart';
 import 'package:let_tutor/utils/models/Schedule.dart';
-import 'package:let_tutor/utils/models/Teacher.dart';
 
 class ListSchedulePage extends StatefulWidget {
   const ListSchedulePage({Key? key}) : super(key: key);
@@ -14,11 +13,11 @@ class ListSchedulePage extends StatefulWidget {
 
 class _ListSchedulePageState extends State<ListSchedulePage> {
   var listSchedules = [
-    Schedule(
-        teacher: sampleTeachers[0],
-        date: 'Sat, 22 Oct 22',
-        startTime: '02:00',
-        endTime: '02:25')
+    // Schedule(
+    //     teacher: sampleTeachers[0],
+    //     date: 'Sat, 22 Oct 22',
+    //     startTime: '02:00',
+    //     endTime: '02:25')
   ];
   @override
   Widget build(BuildContext context) {
