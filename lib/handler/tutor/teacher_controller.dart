@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:let_tutor/handler/api_handler.dart';
 import 'package:let_tutor/models/teacher.dart';
+import 'package:let_tutor/models/teacher_detail.dart';
 
 class TeacherController {
   static const String _path = "tutor/";
@@ -22,5 +23,18 @@ class TeacherController {
       }
     }
     return teachers;
+  }
+
+  static Future<TeacherDetail> getTeacherDetail(String teacherID) async {
+    String requestUrl = "$baseUrl$_path/$teacherID";
+    Response respond = await ApiHandler.handler.get(
+      requestUrl,
+      options: ApiHandler.getHeaders(),
+    );
+    TeacherDetail td = TeacherDetail();
+    if (respond.statusCode == 200) {
+      td = TeacherDetail.fromJson(respond.data);
+    }
+    return td;
   }
 }

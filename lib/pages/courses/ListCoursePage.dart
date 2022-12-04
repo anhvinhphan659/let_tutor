@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/components/dropdown/gf_multiselect.dart';
+import 'package:let_tutor/handler/course/course_controller.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/courses/CourseCard.dart';
 import 'package:let_tutor/utils/models/Course.dart';
@@ -14,6 +15,21 @@ class ListCoursePage extends StatefulWidget {
 }
 
 class _ListCoursePageState extends State<ListCoursePage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    CourseController.getListCourse().then((value) {
+      List<Widget> widgets = CourseController.getWidgetsFromList(value);
+
+      setState(() {
+        tabOptions["Course"] = widgets;
+      });
+    });
+
+    super.initState();
+  }
+
   var searchOptionsHeaders = [
     "Select level",
     "Select category",
@@ -51,48 +67,8 @@ class _ListCoursePageState extends State<ListCoursePage> {
     ]
   ];
   var tabOptions = {
-    "Course:": [
-      Course(
-          courseName: "Life in the Internet Age",
-          description:
-              "Let's discuss how technology is changing the way we live",
-          level: "Intermediate",
-          numLessons: 9,
-          imgURL:
-              'https://camblycurriculumicons.s3.amazonaws.com/5e0e8b212ac750e7dc9886ac?h=d41d8cd98f00b204e9800998ecf8427e.png'),
-      Course(
-          courseName: "Caring for Our Planet",
-          description:
-              "Let's discuss our relationship as humans with our planet, Earth",
-          level: "Intermediate",
-          numLessons: 7,
-          imgURL:
-              'https://camblycurriculumicons.s3.amazonaws.com/5e2b99f70f8f1e9f625e8317?h=d41d8cd98f00b204e9800998ecf8427e.png'),
-      Course(
-          courseName: "Healthy Mind, Healthy Body",
-          description:
-              "Let's discuss the many aspects of living a long, happy life",
-          level: "Intermediate",
-          numLessons: 6,
-          imgURL:
-              'https://camblycurriculumicons.s3.amazonaws.com/5e2b9a4c05342470fdddf8b8?h=d41d8cd98f00b204e9800998ecf8427e.png')
-    ],
-    "E-Book": [
-      Course(
-          courseName: "Let’s go begin",
-          description:
-              "For kids who start learning English the first time or speak a little English only (reading skills are limited).",
-          level: "Beginner",
-          imgURL:
-              'https://api.app.lettutor.com/file/be4c3df8-3b1b-4c8f-a5cc-75a8e2e6626afilewhat_a_world.jpeg'),
-      Course(
-          courseName: "Caring for Our Planet",
-          description:
-              "Let's discuss our relationship as humans with our planet, Earth",
-          level: "Intermediate",
-          imgURL:
-              'https://api.app.lettutor.com/file/be4c3df8-3b1b-4c8f-a5cc-75a8e2e6626afilelets_go.jpeg'),
-    ],
+    "Course:": [],
+    "E-Book": [],
     "Interactive E-book": [],
   };
   String _selectedTab = 'Course';
@@ -100,11 +76,9 @@ class _ListCoursePageState extends State<ListCoursePage> {
   Widget build(BuildContext context) {
     // var screenWidth = MediaQuery.of(context).size.width;
     List<Widget> courseWidgets = [];
-    var selectTab = tabOptions[_selectedTab];
-    if (selectTab != null) {
-      courseWidgets = selectTab.map((e) => CourseCard(course: e)).toList();
-    }
-    // print(screenWidth);
+
+    courseWidgets = (tabOptions[_selectedTab] ?? []) as List<Widget>;
+
     return Scaffold(
       appBar: LettutorAppBar(),
       body: Container(
@@ -193,11 +167,18 @@ class _ListCoursePageState extends State<ListCoursePage> {
                 },
               ),
             ),
-            Container(
-              child: Wrap(
-                children: courseWidgets,
-              ),
-            ),
+            courseWidgets.length > 0
+                ? Container(
+                    child: Wrap(
+                      children: courseWidgets,
+                    ),
+                  )
+                : Column(
+                    children: [
+                      SvgPicture.asset('assets/images/ant_empty_img.svg'),
+                      Text('No data')
+                    ],
+                  ),
           ],
         ),
       ),

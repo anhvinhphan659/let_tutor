@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/models/course.dart';
 import 'package:let_tutor/utils/components/common.dart';
-import 'package:let_tutor/utils/models/Course.dart';
+import 'package:let_tutor/utils/components/courses/CourseCard.dart';
+
 import 'package:let_tutor/utils/styles/styles.dart';
 
 class CourseDetail extends StatelessWidget {
@@ -34,16 +36,16 @@ class CourseDetail extends StatelessWidget {
               SizedBox(
                 height: 210,
                 child: Image.network(
-                  course.imgURL,
+                  course.imageUrl ?? "",
                   fit: BoxFit.fitWidth,
                 ),
               ),
               Text(
-                course.courseName,
+                course.name ?? "",
                 style: LettutorFontStyles.searchTitle,
               ),
               Text(
-                course.description,
+                course.description ?? "",
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: LettutorFontStyles.descriptionText,
@@ -61,22 +63,24 @@ class CourseDetail extends StatelessWidget {
           RowIconText(
               'assets/icons/question-circle.svg', "Why take this course"),
           Text(
-            'Our world is rapidly changing thanks to new technology, and the vocabulary needed to discuss modern life is evolving almost daily. In this course you will learn the most up-to-date terminology from expertly crafted lessons as well from your native-speaking tutor.',
+            course.reason ?? "",
             maxLines: 10,
           ),
           RowIconText(
               'assets/icons/question-circle.svg', "What will you able to do"),
           Text(
-            'You will learn vocabulary related to timely topics like remote work, artificial intelligence, online privacy, and more. In addition to discussion questions, you will practice intermediate level speaking tasks such as using data to describe trends.',
+            course.purpose ?? "",
             maxLines: 10,
           ),
           Header('Experience Level'),
-          RowIconText('assets/icons/usergroup-add.svg', course.level),
+          RowIconText('assets/icons/usergroup-add.svg',
+              CourseCard.getLevel(int.parse(course.level ?? "0"))),
           Header('Course Length'),
-          RowIconText('assets/icons/book.svg', "${course.numLessons} topics"),
+          RowIconText(
+              'assets/icons/book.svg', "${course.topics!.length} topics"),
           Header('List Topic'),
           ...List.generate(
-            course.numLessons,
+            course.topics!.length,
             (index) => Container(
               margin: EdgeInsets.only(bottom: 16.0),
               decoration: BoxDecoration(

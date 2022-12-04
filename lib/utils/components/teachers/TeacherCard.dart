@@ -39,6 +39,7 @@ class TeacherCard extends StatelessWidget {
     if (teacher.country != null) {
       countryName = getCountryNameFromCode(teacher.country!) ?? "";
     }
+    bool hasReview = (teacher.feedbacks ?? []).length > 0;
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -106,26 +107,31 @@ class TeacherCard extends StatelessWidget {
                                 )
                               ],
                             ),
-                            Row(
-                              children: [
-                                ...List.generate(
-                                  (teacher.rating ?? 0.0).floor(),
-                                  (_) => const Icon(
-                                    Icons.star,
-                                    color: Colors.yellow,
-                                    size: 12,
-                                  ),
-                                ),
-                                ...List.generate(
-                                  (5 - (teacher.rating ?? 0.0).floor()),
-                                  (_) => const Icon(
-                                    Icons.star,
-                                    color: Colors.grey,
-                                    size: 12,
-                                  ),
-                                ),
-                              ],
-                            )
+                            hasReview
+                                ? Row(
+                                    children: [
+                                      ...List.generate(
+                                        (teacher.rating ?? 0.0).floor(),
+                                        (_) => const Icon(
+                                          Icons.star,
+                                          color: Colors.yellow,
+                                          size: 12,
+                                        ),
+                                      ),
+                                      ...List.generate(
+                                        (5 - (teacher.rating ?? 0.0).floor()),
+                                        (_) => const Icon(
+                                          Icons.star,
+                                          color: Colors.grey,
+                                          size: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Text(
+                                    "No reviews yet",
+                                    style: LettutorFontStyles.reviewText,
+                                  )
                           ],
                         ),
                       )

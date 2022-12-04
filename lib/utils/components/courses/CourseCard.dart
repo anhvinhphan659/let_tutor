@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/models/course.dart';
 import 'package:let_tutor/pages/courses/CourseDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
-import 'package:let_tutor/utils/models/Course.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
 
@@ -9,9 +9,21 @@ class CourseCard extends StatelessWidget {
   final Course course;
   const CourseCard({required this.course, Key? key}) : super(key: key);
 
+  static String getLevel(int level) {
+    String res = "Beginner";
+    if (level >= 4 && level < 7) {
+      res = "Intermediate";
+    }
+    if (level >= 7) {
+      res = "Advanced";
+    }
+
+    return res;
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(course.imgURL);
+    int numberLesson = (course.topics ?? []).length;
     return GestureDetector(
       onTap: () {
         PushTo(context: context, destination: CourseDetail(course: course));
@@ -38,7 +50,7 @@ class CourseCard extends StatelessWidget {
               SizedBox(
                 height: 210,
                 child: Image.network(
-                  course.imgURL,
+                  course.imageUrl ?? "",
                   fit: BoxFit.fitWidth,
                 ),
               ),
@@ -51,11 +63,11 @@ class CourseCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          course.courseName,
+                          course.name ?? "",
                           style: LettutorFontStyles.courseTitle,
                         ),
                         Text(
-                          course.description,
+                          course.description ?? "",
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: LettutorFontStyles.courseContent,
@@ -68,7 +80,7 @@ class CourseCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 10),
                 child: Text(
-                    '${course.level} ${course.numLessons > 0 ? " • ${course.numLessons} Lessons" : ""}'),
+                    '${getLevel(int.parse(course.level ?? "0"))} ${numberLesson > 0 ? " • $numberLesson Lessons" : ""}'),
               ),
             ]),
       ),
