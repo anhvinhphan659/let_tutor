@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/pages/account/ChangePasswordPage.dart';
 import 'package:let_tutor/pages/account/ProfilePage.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
 import 'package:let_tutor/pages/courses/ListCoursePage.dart';
 import 'package:let_tutor/pages/schedule/HistorySchedulePage.dart';
 import 'package:let_tutor/pages/schedule/ListSchedulePage.dart';
 import 'package:let_tutor/pages/teachers/LettutorPageProfile.dart';
+import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
 
 import 'package:let_tutor/utils/components/common.dart';
 
@@ -25,11 +28,15 @@ class SettingPage extends StatelessWidget {
       {
         "icon": 'assets/icons/key.svg',
         "screen": "Change Password",
-        "function": () {},
+        "function": () {
+          PushTo(context: context, destination: ChangePasswordPage());
+        },
       },
       {
         "icon": 'assets/icons/chalkboard-teacher.svg',
-        "function": () {},
+        "function": () {
+          PushTo(context: context, destination: ListTeacherPage());
+        },
         "screen": "Tutor",
       },
       {
@@ -86,10 +93,10 @@ class SettingPage extends StatelessWidget {
         leadingWidth: 300,
         actions: [
           PopupMenuButton<int>(
-              offset: Offset(0, 60),
-              icon: Icon(Icons.flag_circle),
+              offset: const Offset(0, 60),
+              icon: const Icon(Icons.flag_circle),
               itemBuilder: (context) {
-                return [
+                return const [
                   PopupMenuItem<int>(
                     child: Text('Option 1'),
                     value: 1,
@@ -108,7 +115,7 @@ class SettingPage extends StatelessWidget {
             onPressed: () {
               BackToPrevious(context: context);
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.menu,
               color: Colors.black,
             ),
@@ -118,9 +125,10 @@ class SettingPage extends StatelessWidget {
       body: ListView(children: [
         ListTile(
           onTap: () {
+            UserController.getUserInformation();
             PushTo(context: context, destination: ProfilePage());
           },
-          leading: CircleAvatar(
+          leading: const CircleAvatar(
             backgroundColor: Colors.grey,
             radius: 20,
           ),

@@ -5,7 +5,7 @@ import 'package:getwidget/getwidget.dart';
 
 import 'package:let_tutor/handler/course/course_controller.dart';
 import 'package:let_tutor/handler/tutor/teacher_controller.dart';
-import 'package:let_tutor/models/teacher.dart';
+import 'package:let_tutor/models/teacher/teacher.dart';
 import 'package:let_tutor/pages/conference/VideoConference.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';

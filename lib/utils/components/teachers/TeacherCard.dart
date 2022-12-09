@@ -1,7 +1,6 @@
-import 'package:country_codes/country_codes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:let_tutor/models/teacher.dart';
+import 'package:let_tutor/models/teacher/teacher.dart';
 import 'package:let_tutor/pages/teachers/TeacherDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';

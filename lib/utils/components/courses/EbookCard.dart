@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:let_tutor/models/course/course.dart';
+
 import 'package:let_tutor/pages/courses/CourseDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
 
-class CourseCard extends StatelessWidget {
-  final Course course;
-  const CourseCard({required this.course, Key? key}) : super(key: key);
+import '../../../models/course/e_book.dart';
+
+class EBookCard extends StatelessWidget {
+  final EBook ebook;
+  const EBookCard({required this.ebook, Key? key}) : super(key: key);
 
   static String getLevel(int level) {
     String res = "Beginner";
@@ -23,10 +25,10 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int numberLesson = (course.topics ?? []).length;
+    // int numberLesson = (ebook.topics ?? []).length;
     return GestureDetector(
       onTap: () {
-        PushTo(context: context, destination: CourseDetail(course: course));
+        // PushTo(context: context, destination: CourseDetail(course: ebook));
       },
       child: Container(
         margin: EdgeInsets.all(8.0),
@@ -42,7 +44,7 @@ class CourseCard extends StatelessWidget {
           ],
         ),
         height: 375,
-        width: 375,
+        width: 290,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +52,7 @@ class CourseCard extends StatelessWidget {
               SizedBox(
                 height: 210,
                 child: Image.network(
-                  course.imageUrl ?? "",
+                  ebook.imageUrl ?? "",
                   fit: BoxFit.fitWidth,
                 ),
               ),
@@ -63,11 +65,11 @@ class CourseCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          course.name ?? "",
+                          ebook.name ?? "",
                           style: LettutorFontStyles.courseTitle,
                         ),
                         Text(
-                          course.description ?? "",
+                          ebook.description ?? "",
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: LettutorFontStyles.courseContent,
@@ -79,8 +81,7 @@ class CourseCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 10),
-                child: Text(
-                    '${getLevel(int.parse(course.level ?? "0"))} ${numberLesson > 0 ? " • $numberLesson Lessons" : ""}'),
+                child: Text(getLevel(int.parse(ebook.level ?? "1"))),
               ),
             ]),
       ),

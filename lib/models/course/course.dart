@@ -1,4 +1,4 @@
-import 'category.dart';
+import '../category.dart';
 
 class Course {
   String? id;

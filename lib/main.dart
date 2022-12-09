@@ -8,7 +8,10 @@ import 'package:let_tutor/handler/api_handler.dart';
 import 'package:let_tutor/handler/auth/auth_controller.dart';
 import 'package:let_tutor/handler/data_handler.dart';
 import 'package:let_tutor/handler/http_override.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/models/user.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 
 void main() async {
   await initHandler();
@@ -21,6 +24,15 @@ Future initHandler() async {
   await CountryCodes.init();
 
   await DataHandler.initial();
+  //generate util storage
+  UserController.getAllLearnTopic().then((value) {
+    UtilStorage.learnTopics = value;
+    print(value);
+  });
+  UserController.getAllTestPreparation().then((value) {
+    UtilStorage.testPreparations = value;
+    print(value);
+  });
 
   // ByteData data =
   //     await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');

@@ -1,7 +1,3 @@
-import 'package:let_tutor/models/wallet_info.dart';
-
-import 'lean_topic.dart';
-
 class User {
   String? id;
   String? email;
@@ -13,16 +9,20 @@ class User {
   String? language;
   String? birthday;
   bool? isActivated;
+  TutorInfo? tutorInfo;
   WalletInfo? walletInfo;
-  List<Null>? courses;
-  String? requireNote;
+  Null? requireNote;
   String? level;
   List<LearnTopics>? learnTopics;
-  List<Null>? testPreparations;
+  List<TestPreparations>? testPreparations;
   bool? isPhoneActivated;
   int? timezone;
+  ReferralInfo? referralInfo;
   String? studySchedule;
   bool? canSendMessage;
+  Null? studentGroup;
+  Null? studentInfo;
+  double? avgRating;
 
   User(
       {this.id,
@@ -35,16 +35,20 @@ class User {
       this.language,
       this.birthday,
       this.isActivated,
+      this.tutorInfo,
       this.walletInfo,
-      this.courses,
       this.requireNote,
       this.level,
       this.learnTopics,
       this.testPreparations,
       this.isPhoneActivated,
       this.timezone,
+      this.referralInfo,
       this.studySchedule,
-      this.canSendMessage});
+      this.canSendMessage,
+      this.studentGroup,
+      this.studentInfo,
+      this.avgRating});
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -57,15 +61,12 @@ class User {
     language = json['language'];
     birthday = json['birthday'];
     isActivated = json['isActivated'];
+    tutorInfo = json['tutorInfo'] != null
+        ? new TutorInfo.fromJson(json['tutorInfo'])
+        : null;
     walletInfo = json['walletInfo'] != null
         ? new WalletInfo.fromJson(json['walletInfo'])
         : null;
-    if (json['courses'] != null) {
-      courses = <Null>[];
-      json['courses'].forEach((v) {
-        // courses!.add(new Null.fromJson(v));
-      });
-    }
     requireNote = json['requireNote'];
     level = json['level'];
     if (json['learnTopics'] != null) {
@@ -75,15 +76,21 @@ class User {
       });
     }
     if (json['testPreparations'] != null) {
-      testPreparations = <Null>[];
+      testPreparations = <TestPreparations>[];
       json['testPreparations'].forEach((v) {
-        // testPreparations!.add(new Null.fromJson(v));
+        testPreparations!.add(new TestPreparations.fromJson(v));
       });
     }
     isPhoneActivated = json['isPhoneActivated'];
     timezone = json['timezone'];
+    referralInfo = json['referralInfo'] != null
+        ? new ReferralInfo.fromJson(json['referralInfo'])
+        : null;
     studySchedule = json['studySchedule'];
     canSendMessage = json['canSendMessage'];
+    studentGroup = json['studentGroup'];
+    studentInfo = json['studentInfo'];
+    avgRating = json['avgRating'];
   }
 
   Map<String, dynamic> toJson() {
@@ -98,11 +105,11 @@ class User {
     data['language'] = this.language;
     data['birthday'] = this.birthday;
     data['isActivated'] = this.isActivated;
+    if (this.tutorInfo != null) {
+      data['tutorInfo'] = this.tutorInfo!.toJson();
+    }
     if (this.walletInfo != null) {
       data['walletInfo'] = this.walletInfo!.toJson();
-    }
-    if (this.courses != null) {
-      data['courses'] = this.courses!.map((v) => v).toList();
     }
     data['requireNote'] = this.requireNote;
     data['level'] = this.level;
@@ -110,12 +117,202 @@ class User {
       data['learnTopics'] = this.learnTopics!.map((v) => v.toJson()).toList();
     }
     if (this.testPreparations != null) {
-      data['testPreparations'] = this.testPreparations!.map((v) => v).toList();
+      data['testPreparations'] =
+          this.testPreparations!.map((v) => v.toJson()).toList();
     }
     data['isPhoneActivated'] = this.isPhoneActivated;
     data['timezone'] = this.timezone;
+    if (this.referralInfo != null) {
+      data['referralInfo'] = this.referralInfo!.toJson();
+    }
     data['studySchedule'] = this.studySchedule;
     data['canSendMessage'] = this.canSendMessage;
+    data['studentGroup'] = this.studentGroup;
+    data['studentInfo'] = this.studentInfo;
+    data['avgRating'] = this.avgRating;
+    return data;
+  }
+}
+
+class TutorInfo {
+  String? id;
+  String? video;
+  String? bio;
+  String? education;
+  String? experience;
+  String? profession;
+  Null? accent;
+  String? targetStudent;
+  String? interests;
+  String? languages;
+  String? specialties;
+  Null? resume;
+  Null? rating;
+  bool? isActivated;
+  bool? isNative;
+
+  TutorInfo(
+      {this.id,
+      this.video,
+      this.bio,
+      this.education,
+      this.experience,
+      this.profession,
+      this.accent,
+      this.targetStudent,
+      this.interests,
+      this.languages,
+      this.specialties,
+      this.resume,
+      this.rating,
+      this.isActivated,
+      this.isNative});
+
+  TutorInfo.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    video = json['video'];
+    bio = json['bio'];
+    education = json['education'];
+    experience = json['experience'];
+    profession = json['profession'];
+    accent = json['accent'];
+    targetStudent = json['targetStudent'];
+    interests = json['interests'];
+    languages = json['languages'];
+    specialties = json['specialties'];
+    resume = json['resume'];
+    rating = json['rating'];
+    isActivated = json['isActivated'];
+    isNative = json['isNative'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['video'] = this.video;
+    data['bio'] = this.bio;
+    data['education'] = this.education;
+    data['experience'] = this.experience;
+    data['profession'] = this.profession;
+    data['accent'] = this.accent;
+    data['targetStudent'] = this.targetStudent;
+    data['interests'] = this.interests;
+    data['languages'] = this.languages;
+    data['specialties'] = this.specialties;
+    data['resume'] = this.resume;
+    data['rating'] = this.rating;
+    data['isActivated'] = this.isActivated;
+    data['isNative'] = this.isNative;
+    return data;
+  }
+}
+
+class WalletInfo {
+  String? amount;
+  bool? isBlocked;
+  int? bonus;
+
+  WalletInfo({this.amount, this.isBlocked, this.bonus});
+
+  WalletInfo.fromJson(Map<String, dynamic> json) {
+    amount = json['amount'];
+    isBlocked = json['isBlocked'];
+    bonus = json['bonus'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['amount'] = this.amount;
+    data['isBlocked'] = this.isBlocked;
+    data['bonus'] = this.bonus;
+    return data;
+  }
+}
+
+class LearnTopics {
+  int? id;
+  String? key;
+  String? name;
+
+  LearnTopics({this.id, this.key, this.name});
+
+  LearnTopics.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    key = json['key'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['key'] = this.key;
+    data['name'] = this.name;
+    return data;
+  }
+}
+
+class ReferralInfo {
+  String? referralCode;
+  ReferralPackInfo? referralPackInfo;
+
+  ReferralInfo({this.referralCode, this.referralPackInfo});
+
+  ReferralInfo.fromJson(Map<String, dynamic> json) {
+    referralCode = json['referralCode'];
+    referralPackInfo = json['referralPackInfo'] != null
+        ? new ReferralPackInfo.fromJson(json['referralPackInfo'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['referralCode'] = this.referralCode;
+    if (this.referralPackInfo != null) {
+      data['referralPackInfo'] = this.referralPackInfo!.toJson();
+    }
+    return data;
+  }
+}
+
+class ReferralPackInfo {
+  int? earnPercent;
+
+  ReferralPackInfo({this.earnPercent});
+
+  ReferralPackInfo.fromJson(Map<String, dynamic> json) {
+    earnPercent = json['earnPercent'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['earnPercent'] = this.earnPercent;
+    return data;
+  }
+}
+
+class TestPreparations extends LearnTopics {
+  @override
+  int? id;
+  @override
+  String? key;
+  @override
+  String? name;
+
+  TestPreparations({this.id, this.key, this.name})
+      : super(id: id, key: key, name: name);
+
+  TestPreparations.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    key = json['key'];
+    name = json['name'];
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['key'] = key;
+    data['name'] = name;
     return data;
   }
 }

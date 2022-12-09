@@ -1,27 +1,20 @@
-import 'package:let_tutor/models/course.dart';
+import 'package:let_tutor/models/course/course.dart';
 
-import 'category.dart';
+import '../category.dart';
 
-class EBook extends Course {
-  @override
+class EBook {
   String? id;
-  @override
   String? name;
-  @override
   String? description;
-  @override
   String? imageUrl;
-  @override
   String? level;
   bool? visible;
   String? fileUrl;
-  @override
   String? createdAt;
-  @override
   String? updatedAt;
   Null? isPrivate;
   Null? createdBy;
-  @override
+
   List<Category>? categories;
 
   EBook(

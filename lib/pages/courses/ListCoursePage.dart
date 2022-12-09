@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/components/dropdown/gf_multiselect.dart';
 import 'package:let_tutor/handler/course/course_controller.dart';
+import 'package:let_tutor/models/course/course.dart';
+import 'package:let_tutor/models/course/e_book.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/courses/CourseCard.dart';
-import 'package:let_tutor/utils/models/Course.dart';
+
 import 'package:let_tutor/utils/styles/styles.dart';
 
 class ListCoursePage extends StatefulWidget {
@@ -15,19 +17,23 @@ class ListCoursePage extends StatefulWidget {
 }
 
 class _ListCoursePageState extends State<ListCoursePage> {
+  bool isLoading = true;
   @override
   void initState() {
     // TODO: implement initState
 
-    CourseController.getListCourse().then((value) {
-      List<Widget> widgets = CourseController.getWidgetsFromList(value);
-
-      setState(() {
-        tabOptions["Course"] = widgets;
-      });
-    });
-
+    initData();
     super.initState();
+  }
+
+  Future<void> initData() async {
+    List<Course> courses = await CourseController.getListCourse();
+    List<EBook> ebooks = await CourseController.getListEBook();
+    setState(() {
+      tabOptions["Course"] = CourseController.getCourseCardsFromList(courses);
+      tabOptions["E-Book"] = CourseController.getEbookCardsFromList(ebooks);
+      isLoading = false;
+    });
   }
 
   var searchOptionsHeaders = [
@@ -66,8 +72,8 @@ class _ListCoursePageState extends State<ListCoursePage> {
       "Level increasing",
     ]
   ];
-  var tabOptions = {
-    "Course:": [],
+  Map<String, List<Widget>> tabOptions = {
+    "Course": [],
     "E-Book": [],
     "Interactive E-book": [],
   };
@@ -77,7 +83,7 @@ class _ListCoursePageState extends State<ListCoursePage> {
     // var screenWidth = MediaQuery.of(context).size.width;
     List<Widget> courseWidgets = [];
 
-    courseWidgets = (tabOptions[_selectedTab] ?? []) as List<Widget>;
+    courseWidgets = tabOptions[_selectedTab] ?? [] as List<Widget>;
 
     return Scaffold(
       appBar: LettutorAppBar(),

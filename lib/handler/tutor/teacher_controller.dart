@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:let_tutor/handler/api_handler.dart';
-import 'package:let_tutor/models/teacher.dart';
-import 'package:let_tutor/models/teacher_detail.dart';
+import 'package:let_tutor/models/teacher/teacher.dart';
+import 'package:let_tutor/models/teacher/teacher_detail.dart';
 
 class TeacherController {
   static const String _path = "tutor/";

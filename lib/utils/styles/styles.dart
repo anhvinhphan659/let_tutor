@@ -23,6 +23,12 @@ class LettutorFontStyles {
       fontFamily: 'Poppins, sans-serif',
       color: Colors.black.withOpacity(0.85),
       height: 1.45);
+  static TextStyle h3Title = TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Poppins, sans-serif',
+      color: Colors.black.withOpacity(0.85),
+      height: 1.45);
   //-----------------------------------------
   static TextStyle normalText = TextStyle(
       fontSize: 16,

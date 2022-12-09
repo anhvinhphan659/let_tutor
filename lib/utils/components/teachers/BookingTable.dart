@@ -63,6 +63,16 @@ class _BookingTableState extends State<BookingTable> {
     var DatesInWeek = getDatesOfWeek(initialDate!);
     print(DatesInWeek);
     return Table(
+      columnWidths: const {
+        0: FixedColumnWidth(80),
+        1: FixedColumnWidth(50),
+        2: FixedColumnWidth(50),
+        3: FixedColumnWidth(50),
+        4: FixedColumnWidth(50),
+        5: FixedColumnWidth(50),
+        6: FixedColumnWidth(50),
+        7: FixedColumnWidth(50),
+      },
       border:
           TableBorder.all(width: 1.0, color: Color.fromRGBO(64, 64, 64, 1.0)),
       children: [
@@ -77,63 +87,65 @@ class _BookingTableState extends State<BookingTable> {
         TableRow(
           children: [
             TitleColumnCell(content: '10:00-10:25'),
-            BookingCell(
-              isBooked: true,
+            DataCell(
+              child: BookingCell(
+                isBooked: true,
+              ),
             ),
-            BookingCell(),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
+            DataCell(child: BookingCell()),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
           ],
         ),
         TableRow(
           children: [
             TitleColumnCell(content: '10:00-10:25'),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
           ],
         ),
         TableRow(
           children: [
             TitleColumnCell(content: '10:00-10:25'),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
           ],
         ),
         TableRow(
           children: [
             TitleColumnCell(content: '10:00-10:25'),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
           ],
         ),
         TableRow(
           children: [
             TitleColumnCell(content: '10:00-10:25'),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
-            Text('     '),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
+            DataCell(),
           ],
         ),
       ],
@@ -143,8 +155,12 @@ class _BookingTableState extends State<BookingTable> {
   // ignore: non_constant_identifier_names
   Widget TitleColumnCell({String content = ""}) {
     return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.middle,
       child: Container(
-        color: const Color(0xFFF9F9F9),
+        alignment: Alignment.center,
+        height: 40,
+        color: const Color.fromRGBO(249, 249, 249, 1.0),
+        padding: const EdgeInsets.all(6.0),
         child: Text(content),
       ),
     );
@@ -165,6 +181,16 @@ class _BookingTableState extends State<BookingTable> {
       ),
     );
   }
+
+  Widget DataCell({Widget child = const Text("")}) {
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.middle,
+      child: Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(4.0),
+          child: child),
+    );
+  }
 }
 
 class BookingCell extends StatelessWidget {
@@ -175,10 +201,11 @@ class BookingCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         child: Container(
+      alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
-        color: isBooked ? Colors.grey.shade300 : Colors.blue,
-      ),
+          color: isBooked ? Colors.grey.shade300 : Colors.blue,
+          borderRadius: BorderRadius.circular(16.0)),
       child: Text(
         'Book',
         style: TextStyle(

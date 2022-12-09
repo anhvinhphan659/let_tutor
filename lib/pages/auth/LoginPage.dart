@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:let_tutor/handler/auth/auth_controller.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
 import 'package:let_tutor/utils/components/common.dart';
 
 import 'package:let_tutor/pages/auth/ForgotPasswordPage.dart';
 import 'package:let_tutor/pages/auth/RegisterPage.dart';
 import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -124,6 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                         var loginStatus = await AuthController.login(
                             _usernameTxtController.text,
                             _passwordTxtController.text);
+
                         if (loginStatus == LOGIN_STATUS.SUCCESSFUL) {
                           PushTo(
                               context: context,
