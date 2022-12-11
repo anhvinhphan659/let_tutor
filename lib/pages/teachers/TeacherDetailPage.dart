@@ -2,7 +2,9 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/handler/schedule/schedule_controller.dart';
 import 'package:let_tutor/handler/tutor/teacher_controller.dart';
+import 'package:let_tutor/models/schedule/teacher_schedule.dart';
 import 'package:let_tutor/models/teacher/teacher.dart';
 import 'package:let_tutor/models/teacher/teacher_detail.dart';
 import 'package:let_tutor/pages/account/SettingPage.dart';
@@ -29,8 +31,11 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
   late Teacher teacher;
   late TeacherDetail teacherDetail;
 
+  List<TeacherSchedule> bookingSchedule = <TeacherSchedule>[];
+
   bool isFavorite = false;
   bool isLoading = true;
+  DateTime initialDate = DateTime.now();
 
   @override
   void initState() {
@@ -38,25 +43,44 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
     _controller = VideoPlayerController.network(teacher.video ?? "");
 
-    _controller.initialize().then((value) async {
-      teacherDetail = await TeacherController.getTeacherDetail(teacher.userId!);
+    TeacherController.getTeacherDetail(teacher.userId!).then((value) {
       setState(() {
-        flickManager = FlickManager(videoPlayerController: _controller);
+        teacherDetail = value;
         isLoading = false;
       });
     });
+    // _controller.initialize().then((value) async {
+    //   setState(() {
+    //     flickManager = FlickManager(videoPlayerController: _controller);
+    //     isLoading = false;
+    //   });
+    // });
+    // ScheduleController.getScheduleByTutor(teacher.userId ?? "");
+    getListScheduleInWeek();
 
     super.initState();
   }
 
   @override
   void dispose() {
-    flickManager.dispose();
+    // flickManager.dispose();
 
     super.dispose();
   }
 
-  var initialDate = DateTime.now();
+  void getListScheduleInWeek() {
+    print("call schefule controller");
+    ScheduleController.getScheduleByTutor(teacher.userId!,
+            startTime: initialDate)
+        .then((value) {
+      if (value.length > 0) {
+        setState(() {
+          bookingSchedule = value;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,22 +236,22 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                       )
                     ],
                   ),
-                  SizedBox(
-                    height: 300,
-                    child: _controller.value.isInitialized
-                        ? FlickVideoPlayer(
-                            flickManager: flickManager,
-                            flickVideoWithControls:
-                                const FlickVideoWithControls(
-                              videoFit: BoxFit.fitHeight,
-                              controls: FlickPortraitControls(),
-                            ),
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(
-                            color: Colors.grey,
-                          )),
-                  ),
+                  // SizedBox(
+                  //   height: 300,
+                  //   child: _controller.value.isInitialized
+                  //       ? FlickVideoPlayer(
+                  //           flickManager: flickManager,
+                  //           flickVideoWithControls:
+                  //               const FlickVideoWithControls(
+                  //             videoFit: BoxFit.fitHeight,
+                  //             controls: FlickPortraitControls(),
+                  //           ),
+                  //         )
+                  //       : const Center(
+                  //           child: CircularProgressIndicator(
+                  //           color: Colors.grey,
+                  //         )),
+                  // ),
                   Text(
                     'Languages',
                     style: LettutorFontStyles.headerTeacherDetail,
@@ -328,33 +352,45 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                         child: Text('Today'),
                       ),
                       TextButton(
-                          onPressed: () {
+                        onPressed: () {
+                          var newInitalDate =
+                              initialDate.subtract(const Duration(days: 7));
+                          if (newInitalDate.isBefore(DateTime.now()) == false) {
                             setState(() {
-                              initialDate =
-                                  initialDate.subtract(const Duration(days: 7));
-                              print('New inital: ' + initialDate.toString());
+                              initialDate = newInitalDate;
                             });
-                          },
-                          child: Text('<')),
+                          }
+                        },
+                        child: Icon(
+                          Icons.chevron_left,
+                          color: Colors.black.withOpacity(0.85),
+                        ),
+                      ),
                       TextButton(
-                          onPressed: () {
-                            setState(() {
-                              initialDate =
-                                  initialDate.add(const Duration(days: 7));
-                              print('New inital: ' + initialDate.toString());
-                            });
-                          },
-                          child: Text('>')),
+                        onPressed: () {
+                          setState(() {
+                            initialDate =
+                                initialDate.add(const Duration(days: 7));
+                          });
+                        },
+                        child: Icon(
+                          Icons.chevron_right,
+                          color: Colors.black.withOpacity(0.85),
+                        ),
+                      ),
                       Text(getDisplayTitle(initialDate))
                     ],
                   ),
                   SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Container(
-                          width: 500,
-                          child: BookingTable(
-                            initialDate: initialDate,
-                          )))
+                    scrollDirection: Axis.horizontal,
+                    child: Container(
+                      width: 500,
+                      child: BookingTable(
+                        initialDate: initialDate,
+                        teacherSchedule: bookingSchedule,
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

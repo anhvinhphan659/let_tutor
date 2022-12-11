@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:let_tutor/handler/schedule/schedule_controller.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/models/schedule/schedule.dart';
+import 'package:let_tutor/models/schedule/teacher_schedule.dart';
+import 'package:let_tutor/pages/account/ProfilePage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 
 DateTime getStartDateOfWeek(DateTime dt) {
@@ -7,9 +12,6 @@ DateTime getStartDateOfWeek(DateTime dt) {
 }
 
 List<DateTime> getDatesOfWeek(DateTime startTime) {
-  if (startTime.weekday != DateTime.monday) {
-    startTime = getStartDateOfWeek(startTime);
-  }
   return List.generate(7, (range) => startTime.add(Duration(days: range)));
 }
 
@@ -39,39 +41,191 @@ String getDisplayTitle(DateTime initialDate) {
   return ret;
 }
 
-// ignore: must_be_immutable
-class BookingTable extends StatefulWidget {
-  DateTime? initialDate;
-  BookingTable({Key? key, this.initialDate}) : super(key: key);
-
-  @override
-  State<BookingTable> createState() => _BookingTableState();
+List<String> getListPeriod() {
+  List<String> periods = [];
+  DateTime start = DateTime(2000, 1, 1, 0, 0);
+  DateTime end = start.add(const Duration(days: 1));
+  DateFormat df = DateFormat("HH:mm");
+  while (start.isBefore(end)) {
+    DateTime endPeriod = start.add(const Duration(minutes: 25));
+    periods.add("${df.format(start)}-${df.format(endPeriod)}");
+    start = start.add(const Duration(minutes: 30));
+  }
+  return periods;
 }
 
-class _BookingTableState extends State<BookingTable> {
-  static const daysInWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+// ignore: must_be_immutable
+class BookingTable extends StatelessWidget {
   DateTime? initialDate;
-  @override
-  void initState() {
-    print("Widget initial: " + widget.initialDate.toString());
-    super.initState();
-  }
+  Function? callBack;
+
+  List<TeacherSchedule> teacherSchedule;
+  BookingTable(
+      {Key? key,
+      this.initialDate,
+      this.teacherSchedule = const <TeacherSchedule>[],
+      this.callBack})
+      : super(key: key);
+
+  static const daysInWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static List<String> periods = getListPeriod();
+
+  // ignore: constant_identifier_names
+  static const double DATA_COLUMN_WIDTH = 80.0;
+  TextEditingController _noteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    initialDate = widget.initialDate ?? DateTime.now();
+    initialDate = initialDate ?? DateTime.now();
     var DatesInWeek = getDatesOfWeek(initialDate!);
-    print(DatesInWeek);
+
+    Map<String, List<Widget>> tableDataMap = {};
+
+    for (String period in periods) {
+      tableDataMap[period] = [
+        TitleColumnCell(content: period),
+        ...daysInWeek.map((e) => DataCell())
+      ];
+    }
+
+    for (var schedule in teacherSchedule) {
+      DateTime startPeriod =
+          DateTime.fromMillisecondsSinceEpoch(schedule.startTimestamp ?? 0);
+      DateTime endPeriod =
+          DateTime.fromMillisecondsSinceEpoch(schedule.endTimestamp ?? 0);
+      DateFormat df = DateFormat("HH:mm");
+      String period = "${df.format(startPeriod)}-${df.format(endPeriod)}";
+
+      if (tableDataMap[period] != null) {
+        bool isBooked =
+            schedule.getListUserID().contains(UserController.currentUser.id);
+        tableDataMap[period]![startPeriod.day - initialDate!.day + 1] =
+            DataCell(
+                child: GestureDetector(
+          onTap: () {
+            String bookingTime =
+                "$period ${DateFormat("EEEE, d MMMM yyyy").format(startPeriod)}";
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                elevation: 1.0,
+                title: Text("Booking details"),
+                content: Container(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      UserTitleHeader("Booking Time", isCompulsory: false),
+                      Container(
+                          margin: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: const Color.fromRGBO(238, 234, 255, 1.0),
+                              borderRadius: BorderRadius.circular(5.0)),
+                          child: Text(
+                            bookingTime,
+                            style: LettutorFontStyles.bookingTimeText,
+                          )),
+                      UserTitleHeader("Note", isCompulsory: false),
+                      TextFormField(
+                        maxLines: 5,
+                        minLines: 4,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFD9D9D9),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF40A9FF),
+                            ),
+                          ),
+                        ),
+                        controller: _noteController,
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text("Cancel")),
+                  ElevatedButton(
+                      onPressed: () async {
+                        print(schedule.getListScheduleId());
+                        bool result = await ScheduleController.bookAClass(
+                            schedule.getListScheduleId(), _noteController.text);
+                        if (result) {
+                          if (callBack != null) {
+                            callBack!();
+                          }
+                          Navigator.pop(context);
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: const Text("Booking details"),
+                                    content: Container(
+                                        child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.check_circle_sharp,
+                                          color: Colors.green,
+                                        ),
+                                        Text(
+                                          "Booking success",
+                                          style: LettutorFontStyles.normalText
+                                              .copyWith(
+                                                  fontWeight: FontWeight.w600),
+                                        ),
+                                        Text(
+                                          "Check your mail's inbox to see detail order",
+                                          style: LettutorFontStyles.normalText,
+                                        )
+                                      ],
+                                    )),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("Done"))
+                                    ],
+                                  ));
+                        }
+
+                        _noteController.clear();
+                      },
+                      child: Text(">> Book")),
+                ],
+              ),
+            );
+          },
+          child: BookingCell(
+            isBooked: isBooked,
+          ),
+        ));
+      }
+    }
+
+    //TODO: custom data here
+
     return Table(
       columnWidths: const {
-        0: FixedColumnWidth(80),
-        1: FixedColumnWidth(50),
-        2: FixedColumnWidth(50),
-        3: FixedColumnWidth(50),
-        4: FixedColumnWidth(50),
-        5: FixedColumnWidth(50),
-        6: FixedColumnWidth(50),
-        7: FixedColumnWidth(50),
+        0: FixedColumnWidth(100),
+        1: FixedColumnWidth(DATA_COLUMN_WIDTH),
+        2: FixedColumnWidth(DATA_COLUMN_WIDTH),
+        3: FixedColumnWidth(DATA_COLUMN_WIDTH),
+        4: FixedColumnWidth(DATA_COLUMN_WIDTH),
+        5: FixedColumnWidth(DATA_COLUMN_WIDTH),
+        6: FixedColumnWidth(DATA_COLUMN_WIDTH),
+        7: FixedColumnWidth(DATA_COLUMN_WIDTH),
       },
       border:
           TableBorder.all(width: 1.0, color: Color.fromRGBO(64, 64, 64, 1.0)),
@@ -84,69 +238,10 @@ class _BookingTableState extends State<BookingTable> {
             ),
           ],
         ),
-        TableRow(
-          children: [
-            TitleColumnCell(content: '10:00-10:25'),
-            DataCell(
-              child: BookingCell(
-                isBooked: true,
-              ),
-            ),
-            DataCell(child: BookingCell()),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-          ],
-        ),
-        TableRow(
-          children: [
-            TitleColumnCell(content: '10:00-10:25'),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-          ],
-        ),
-        TableRow(
-          children: [
-            TitleColumnCell(content: '10:00-10:25'),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-          ],
-        ),
-        TableRow(
-          children: [
-            TitleColumnCell(content: '10:00-10:25'),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-          ],
-        ),
-        TableRow(
-          children: [
-            TitleColumnCell(content: '10:00-10:25'),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-            DataCell(),
-          ],
+        ...tableDataMap.keys.map(
+          (e) => TableRow(
+            children: tableDataMap[e],
+          ),
         ),
       ],
     );
@@ -204,13 +299,12 @@ class BookingCell extends StatelessWidget {
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
-          color: isBooked ? Colors.grey.shade300 : Colors.blue,
+          color: isBooked ? Colors.white : Colors.blue,
           borderRadius: BorderRadius.circular(16.0)),
       child: Text(
-        'Book',
+        isBooked ? 'Booked' : 'Book',
         style: TextStyle(
-          color: isBooked ? Colors.grey : Colors.white,
-        ),
+            color: isBooked ? Colors.green : Colors.white, fontSize: 12),
       ),
     ));
   }

@@ -49,11 +49,13 @@ class EBookCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 210,
-                child: Image.network(
-                  ebook.imageUrl ?? "",
-                  fit: BoxFit.fitWidth,
+              Center(
+                child: SizedBox(
+                  height: 210,
+                  child: Image.network(
+                    ebook.imageUrl ?? "",
+                    fit: BoxFit.fitWidth,
+                  ),
                 ),
               ),
               Padding(

@@ -9,6 +9,7 @@ import 'package:let_tutor/models/course/course.dart';
 import 'package:let_tutor/models/course/e_book.dart';
 import 'package:let_tutor/utils/components/courses/CourseCard.dart';
 import 'package:let_tutor/utils/components/courses/EbookCard.dart';
+import 'package:let_tutor/utils/styles/styles.dart';
 
 class CourseController {
   static const String _coursePath = "course";
@@ -48,7 +49,10 @@ class CourseController {
       }
     }
     for (var category in courseMap.keys) {
-      res.add(Text(category));
+      res.add(Text(
+        category,
+        style: LettutorFontStyles.h1Title,
+      ));
       List<Course> courseByCategory = courseMap[category] ?? [];
       for (var course in courseByCategory) {
         res.add(CourseCard(course: course));

@@ -17,6 +17,12 @@ class LettutorColors {
 
 class LettutorFontStyles {
 //common
+  static TextStyle h1Title = TextStyle(
+      fontSize: 28,
+      fontWeight: FontWeight.w500,
+      fontFamily: 'Poppins, sans-serif',
+      color: Colors.black.withOpacity(0.85),
+      height: 1.45);
   static TextStyle h2Title = TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.w600,
@@ -101,7 +107,13 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(0, 0, 0, 0.85),
       height: 1.45);
-
+  static TextStyle bookingTimeText = const TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    fontFamily: 'Roboto, sans-serif',
+    color: Color.fromRGBO(119, 102, 199, 1.0),
+    height: 1.45,
+  );
 //---------------------------------------//
 //teacher pages
   static TextStyle headerTeacherDetail = const TextStyle(

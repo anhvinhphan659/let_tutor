@@ -249,6 +249,10 @@ class LearnTopics {
     data['name'] = this.name;
     return data;
   }
+
+  @override
+  // TODO: implement hashCode
+  int get hashCode => super.hashCode;
 }
 
 class ReferralInfo {
