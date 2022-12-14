@@ -2,13 +2,16 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:let_tutor/models/schedule/booking_history.dart';
+import 'package:let_tutor/models/schedule/schedule.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
-import 'package:let_tutor/utils/models/Schedule.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 class ScheduleCard extends StatefulWidget {
-  final Schedule schedule;
+  final BookingSchedule schedule;
   const ScheduleCard({required this.schedule, Key? key}) : super(key: key);
 
   @override
@@ -18,8 +21,13 @@ class ScheduleCard extends StatefulWidget {
 class _ScheduleCardState extends State<ScheduleCard> {
   @override
   Widget build(BuildContext context) {
-    var teacher = widget.schedule.teacher;
+    var schedule = widget.schedule;
+    var teacher = widget.schedule.scheduleDetailInfo!.scheduleInfo!.tutorInfo;
+    var scheduleDetail = widget.schedule.scheduleDetailInfo!;
+    DateTime startTime = DateTime.fromMillisecondsSinceEpoch(
+        scheduleDetail.startPeriodTimestamp ?? 0);
     return Container(
+      margin: const EdgeInsets.only(top: 24),
       padding: const EdgeInsets.all(12.0),
       color: const Color.fromRGBO(241, 241, 241, 1),
       child: Wrap(
@@ -27,29 +35,40 @@ class _ScheduleCardState extends State<ScheduleCard> {
           Container(
             constraints: const BoxConstraints(minWidth: 200),
             margin: const EdgeInsets.only(bottom: 12),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [Text('Sat, 22 Oct 22'), Text('1 lesson')]),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                DateFormat("EEE, dd MMM yy").format(startTime),
+                style: LettutorFontStyles.meeting_date,
+              ),
+              Text(
+                "1 lesson",
+                style: LettutorFontStyles.hintText,
+              )
+            ]),
           ),
           Container(
+            padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 12),
             color: Colors.white,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  children: [
-                    StateAvatar(
-                      foregroundRadius: 5,
-                      backgroundRadius: 30,
-                      dx: 46,
-                      child: Image.asset(
-                        'assets/images/teacher1.png',
-                        fit: BoxFit.fitHeight,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: Column(
+                    children: [
+                      StateAvatar(
+                        foregroundRadius: 5,
+                        backgroundRadius: 30,
+                        dx: 46,
+                        displayTop: teacher!.isActivated ?? false,
+                        child: Image.network(
+                          teacher!.avatar ?? "",
+                        ),
                       ),
-                      displayTop: true,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 Container(
                   padding: EdgeInsets.only(left: 10, bottom: 10),
@@ -57,24 +76,25 @@ class _ScheduleCardState extends State<ScheduleCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Text(
-                      //   teacher.name,
-                      //   style: LettutorFontStyles.teacherNameText,
-                      // ),
+                      Text(
+                        teacher.name ?? "",
+                        style: LettutorFontStyles.teacherNameText,
+                      ),
                       Row(
                         children: [
                           Container(
                             height: 18,
                             width: 24,
-                            // child: SvgPicture.network(
+                            // child:
+                            // SvgPicture.network(
                             //   teacher.national_img,
                             //   fit: BoxFit.cover,
                             // ),
                           ),
                           // Text(
-                          // teacher.nationality,
-                          // style: LettutorFontStyles.descriptionText.copyWith(
-                          // color: const Color.fromRGBO(11, 34, 57, 1.0)),
+                          //   teacher.nationality,
+                          //   style: LettutorFontStyles.descriptionText.copyWith(
+                          //       color: const Color.fromRGBO(11, 34, 57, 1.0)),
                           // )
                         ],
                       ),
@@ -105,7 +125,11 @@ class _ScheduleCardState extends State<ScheduleCard> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("02:00 - 02:25"),
+                  Text(convertTimeStampToHour(
+                          scheduleDetail.startPeriodTimestamp ?? 0) +
+                      "-" +
+                      convertTimeStampToHour(
+                          scheduleDetail.endPeriodTimestamp ?? 0)),
                   ElevatedButton(
                       onPressed: () {},
                       child: Row(

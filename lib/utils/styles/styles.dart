@@ -162,4 +162,12 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(120, 120, 120, 1.0),
       height: 1.45);
+
+  //schedule
+  static TextStyle meeting_date = const TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w700,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(0, 0, 0, 0.85),
+      height: 1.33);
 }
