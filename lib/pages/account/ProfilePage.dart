@@ -6,9 +6,10 @@ import 'package:let_tutor/handler/user/user_controller.dart';
 import 'package:let_tutor/models/user.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
+import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
 import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
-import 'package:multi_select_flutter/chip_field/multi_select_chip_field.dart';
+
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import 'SettingPage.dart';
@@ -67,6 +68,15 @@ class _ProfilePageState extends State<ProfilePage> {
     _levelSelected = user.level ?? "";
     _birthdaySelected = DateTime.parse(user.birthday ?? "");
 
+    Widget avatarWidget = DefaultAvatar(teacherName: user.name ?? "");
+    if (user.avatar != null) {
+      if (!user.avatar!.contains("avatar-default")) {
+        avatarWidget = Image.network(
+          user.avatar!,
+          fit: BoxFit.fill,
+        );
+      }
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -132,15 +142,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Center(
                           child: StateAvatar(
+                            backgroundTopColor: Colors.blue,
                             backgroundRadius: 65,
-                            foregroundRadius: 20,
-                            child: Container(color: Colors.red),
-                            dx: 60,
-                            topWidget: Icon(
-                              Icons.pending,
-                              size: 20,
+                            foregroundRadius: 15,
+                            dx: 94,
+                            topWidget: const Icon(
+                              Icons.create,
+                              size: 18,
+                              color: Colors.white,
                             ),
                             displayTop: true,
+                            child: avatarWidget,
                           ),
                         ),
                         Text(

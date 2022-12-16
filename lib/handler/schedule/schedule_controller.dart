@@ -152,4 +152,37 @@ class ScheduleController {
     }
     return {"count": count, "bookedSchedule": bookedSchedule};
   }
+
+  static Future<BookingSchedule?> getNextLesson() async {
+    BookingSchedule? schedule;
+    String requestUrl = "$baseUrl$_bookingPath/next";
+    var queryParams = {
+      "dateTime": DateTime.now().millisecondsSinceEpoch,
+    };
+    Response respond = await ApiHandler.handler.get(
+      requestUrl,
+      queryParameters: queryParams,
+      options: ApiHandler.getHeaders(),
+    );
+    if (respond.statusCode == 200) {
+      var data = respond.data['data'] as List<dynamic>;
+      if (data.isNotEmpty) {
+        schedule = BookingSchedule.fromJson(data[0]);
+      }
+    }
+    return schedule;
+  }
+
+  static Future<int> getLessonTotalTime() async {
+    String requestUrl = "${baseUrl}call/total";
+    Response respond = await ApiHandler.handler.get(
+      requestUrl,
+      options: ApiHandler.getHeaders(),
+    );
+
+    if (respond.statusCode == 200) {
+      return respond.data as int;
+    }
+    return 0;
+  }
 }

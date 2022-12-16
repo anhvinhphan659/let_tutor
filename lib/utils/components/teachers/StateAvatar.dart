@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class StateAvatar extends StatelessWidget {
   final double backgroundRadius;
   final double foregroundRadius;
+  Color? backgroundTopColor;
   Widget? child;
   Widget? topWidget;
   final bool displayTop;
@@ -17,6 +18,7 @@ class StateAvatar extends StatelessWidget {
       this.foregroundRadius = 5,
       this.displayTop = false,
       this.dx = 0,
+      this.backgroundTopColor,
       Key? key})
       : super(key: key);
 
@@ -28,13 +30,11 @@ class StateAvatar extends StatelessWidget {
       padding: const EdgeInsets.all(2.0),
       child: Stack(
         children: [
-          ClipOval(
-            child: Container(
-              height: backgroundRadius * 2,
-              width: backgroundRadius * 2,
-              color: Colors.white,
-              child: Center(child: child),
-            ),
+          Container(
+            height: backgroundRadius * 2,
+            width: backgroundRadius * 2,
+            color: Colors.white,
+            child: ClipOval(child: child),
           ),
           displayTop
               ? Positioned(
@@ -42,7 +42,7 @@ class StateAvatar extends StatelessWidget {
                   left: dx,
                   child: CircleAvatar(
                     radius: foregroundRadius,
-                    backgroundColor: Colors.green,
+                    backgroundColor: backgroundTopColor ?? Colors.green,
                     child: topWidget,
                   ))
               : const SizedBox(),

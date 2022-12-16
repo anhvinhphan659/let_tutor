@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/handler/course/course_controller.dart';
 import 'package:let_tutor/handler/schedule/schedule_controller.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/models/course/study_progress.dart';
 import 'package:let_tutor/models/schedule/booking_history.dart';
 
 import 'package:let_tutor/utils/components/common.dart';
@@ -22,6 +25,10 @@ class _ListSchedulePageState extends State<ListSchedulePage> {
   bool isLoading = true;
   List<BookingSchedule> listSchedules = [];
 
+  int latestPage = 0;
+  String fileName = "";
+  String fileURL = "";
+
   @override
   void initState() {
     // TODO: implement initState
@@ -32,6 +39,19 @@ class _ListSchedulePageState extends State<ListSchedulePage> {
   void updateListSchedule({int page = 1, int perPage = DEFAULT_PER_PAGE}) {
     setState(() {
       isLoading = true;
+    });
+
+    CourseController.getLatestLearning(UserController.currentUser.id ?? "")
+        .then((latestLearningDate) {
+      if (latestLearningDate != null) {
+        setState(() {
+          latestPage = latestLearningDate.currentPage ?? 0;
+          if (latestLearningDate.eBook != null) {
+            fileName = latestLearningDate.eBook!.name ?? "";
+            fileURL = latestLearningDate.eBook!.fileUrl ?? "";
+          }
+        });
+      }
     });
     ScheduleController.getComingSchedule(
             page: page,
@@ -88,13 +108,20 @@ class _ListSchedulePageState extends State<ListSchedulePage> {
                         LettutorFontStyles.contentText.copyWith(fontSize: 18),
                   ),
                 ),
-                Text('Latest Book'),
+                Padding(
+                  padding: const EdgeInsets.only(top: 48.0),
+                  child: Text(
+                    'Latest Book',
+                    style: LettutorFontStyles.normalText
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
                 Table(
-                  columnWidths: {
-                    0: FixedColumnWidth(150),
-                    1: FixedColumnWidth(50),
-                    2: FixedColumnWidth(80),
-                    3: FlexColumnWidth(),
+                  columnWidths: const {
+                    0: FixedColumnWidth(50),
+                    1: FlexColumnWidth(),
+                    2: FixedColumnWidth(50),
+                    3: FixedColumnWidth(50),
                   },
                   border: TableBorder.all(
                       color: const Color.fromRGBO(
@@ -109,21 +136,29 @@ class _ListSchedulePageState extends State<ListSchedulePage> {
                       Container(
                         color: Color.fromRGBO(250, 250, 250, 1.0),
                         height: 70,
-                        child: Text('Name'),
+                        child: Center(child: Text("Name")),
                       ),
-                      Text(''),
+                      Center(
+                        child: TextButton(
+                          child: Text(fileName),
+                          onPressed: () {
+                            //TODO: show file URL
+                            print("File URL: " + fileURL);
+                          },
+                        ),
+                      ),
                       Container(
                         height: 70,
                         color: Color.fromRGBO(250, 250, 250, 1.0),
-                        child: Text('Page'),
+                        child: Center(child: Text('Page')),
                       ),
-                      Text('0')
+                      Text(latestPage > 0 ? latestPage.toString() : ""),
                     ]),
                     TableRow(children: [
                       Container(
                         color: Color.fromRGBO(250, 250, 250, 1.0),
                         height: 70,
-                        child: Text('Description'),
+                        child: Center(child: Text('Description')),
                       ),
                       Text(' '),
                       Text(' '),
@@ -145,7 +180,7 @@ class _ListSchedulePageState extends State<ListSchedulePage> {
                               schedule: e,
                             ),
                           ),
-                          listSchedules.length > 0
+                          listSchedules.isNotEmpty
                               ? NumberPaginator(
                                   numberPages: pageCount,
                                   initialPage: _currentPage - 1,

@@ -147,7 +147,7 @@ class TutorInfo {
   String? languages;
   String? specialties;
   Null? resume;
-  Null? rating;
+  double? rating;
   bool? isActivated;
   bool? isNative;
 

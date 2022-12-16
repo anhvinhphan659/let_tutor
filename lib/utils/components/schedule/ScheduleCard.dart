@@ -19,6 +19,7 @@ class ScheduleCard extends StatefulWidget {
 }
 
 class _ScheduleCardState extends State<ScheduleCard> {
+  bool isExpand = true;
   @override
   Widget build(BuildContext context) {
     var schedule = widget.schedule;
@@ -26,6 +27,8 @@ class _ScheduleCardState extends State<ScheduleCard> {
     var scheduleDetail = widget.schedule.scheduleDetailInfo!;
     DateTime startTime = DateTime.fromMillisecondsSinceEpoch(
         scheduleDetail.startPeriodTimestamp ?? 0);
+    bool canCancel =
+        DateTime.now().add(Duration(hours: 1)).compareTo(startTime) < 0;
     return Container(
       margin: const EdgeInsets.only(top: 24),
       padding: const EdgeInsets.all(12.0),
@@ -119,32 +122,92 @@ class _ScheduleCardState extends State<ScheduleCard> {
           ),
           Container(
             margin: const EdgeInsets.only(bottom: 12),
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 6),
             color: Colors.white,
             child: Column(children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(convertTimeStampToHour(
-                          scheduleDetail.startPeriodTimestamp ?? 0) +
-                      "-" +
-                      convertTimeStampToHour(
-                          scheduleDetail.endPeriodTimestamp ?? 0)),
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: Row(
-                        children: [Icon(Icons.cancel), Text('Cancel')],
-                      ))
-                ],
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${convertTimeStampToHour(scheduleDetail.startPeriodTimestamp ?? 0)}-${convertTimeStampToHour(scheduleDetail.endPeriodTimestamp ?? 0)}",
+                      style: LettutorFontStyles.defaultAvatarText.copyWith(
+                          color: Colors.black.withOpacity(
+                            0.85,
+                          ),
+                          fontWeight: FontWeight.normal),
+                    ),
+                    canCancel
+                        ? GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(2.0),
+                                  border: Border.all(color: Colors.red)),
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.cancel,
+                                    color: Colors.red,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    'Cancel',
+                                    style: TextStyle(color: Colors.red),
+                                  )
+                                ],
+                              ),
+                            ))
+                        : const SizedBox(),
+                  ],
+                ),
               ),
-              ExpansionTile(
-                title: Text('Request for lesson'),
-                children: [
-                  Text(
-                    'Currently there are no requests for this class. Please write down any requests for the teacher.',
-                    maxLines: 10,
-                  )
-                ],
+              Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300)),
+                child: ExpansionTile(
+                  leading: Icon(
+                    isExpand ? Icons.expand_more : Icons.chevron_right,
+                    color: Colors.black.withOpacity(0.85),
+                  ),
+                  initiallyExpanded: true,
+                  trailing: TextButton(
+                    child: Text("Edit Request"),
+                    onPressed: () {},
+                  ),
+                  onExpansionChanged: (value) {
+                    setState(() {
+                      isExpand = value;
+                    });
+                  },
+                  title: Text(
+                    'Request for lesson',
+                    style: LettutorFontStyles.request_text,
+                  ),
+                  childrenPadding: const EdgeInsets.all(16.0),
+                  children: [
+                    Container(
+                      alignment: Alignment.topLeft,
+                      color: Colors.white,
+                      margin: const EdgeInsets.only(bottom: 14),
+                      child: Text(
+                        schedule.studentRequest != null
+                            ? schedule.studentRequest!
+                            : 'Currently there are no requests for this class. Please write down any requests for the teacher.',
+                        style: schedule.studentRequest != null
+                            ? LettutorFontStyles.request_text
+                            : LettutorFontStyles.no_request_text,
+                      ),
+                    )
+                  ],
+                ),
               )
             ]),
           ),
@@ -152,7 +215,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: canCancel ? null : () {},
                 child: Text('Go to meeting'),
               )
             ],

@@ -147,6 +147,13 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(0, 0, 0, 0.6),
       height: 1.45);
+
+  static const TextStyle nextLessonText = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.normal,
+      fontFamily: 'Roboto, sans-serif',
+      color: Colors.white,
+      height: 1.45);
   //---------------------------------------//
 //course pages
   static TextStyle courseTitle = const TextStyle(
@@ -167,6 +174,27 @@ class LettutorFontStyles {
   static TextStyle meeting_date = const TextStyle(
       fontSize: 24,
       fontWeight: FontWeight.w700,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(0, 0, 0, 0.85),
+      height: 1.33);
+
+  static TextStyle no_request_text = const TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(131, 153, 167, 1.0),
+      height: 1.33);
+  static TextStyle request_text = const TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      fontFamily: 'Roboto, sans-serif',
+      color: Color.fromRGBO(0, 0, 0, 0.85),
+      height: 1.33);
+
+  //setting page
+  static TextStyle settingText = const TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(0, 0, 0, 0.85),
       height: 1.33);

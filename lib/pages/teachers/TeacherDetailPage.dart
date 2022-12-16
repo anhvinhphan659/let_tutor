@@ -11,6 +11,7 @@ import 'package:let_tutor/pages/account/SettingPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/BookingTable.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
+import 'package:let_tutor/utils/data/country.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
 import 'package:let_tutor/utils/util_function.dart';
@@ -49,6 +50,8 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
         isLoading = false;
       });
     });
+
+    isFavorite = teacherDetail.isFavorite ?? false;
     // _controller.initialize().then((value) async {
     //   setState(() {
     //     flickManager = FlickManager(videoPlayerController: _controller);
@@ -73,7 +76,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
     ScheduleController.getScheduleByTutor(teacher.userId!,
             startTime: initialDate)
         .then((value) {
-      if (value.length > 0) {
+      if (value.isNotEmpty) {
         setState(() {
           bookingSchedule = value;
         });
@@ -83,6 +86,11 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    Country? country = getCountryByCodeName(teacher.country ?? "");
+    String countryName = "";
+    if (country != null) {
+      countryName = country.name ?? "";
+    }
     return Scaffold(
       appBar: LettutorAppBar(),
       body: isLoading
@@ -126,13 +134,28 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                                   Container(
                                     height: 18,
                                     width: 24,
+                                    margin: const EdgeInsets.only(right: 4.0),
                                     child: SvgPicture.network(
-                                      'https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.3/flags/4x3/${(teacher.country ?? "VN").toLowerCase()}.svg',
+                                      'https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.3/flags/4x3/${(teacher.country ?? "").toLowerCase()}.svg',
                                       fit: BoxFit.cover,
+                                      placeholderBuilder: (context) =>
+                                          Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.black
+                                                    .withOpacity(0.85),
+                                                width: 1)),
+                                        height: 4,
+                                        width: 3,
+                                        child: const Icon(
+                                          Icons.broken_image,
+                                          size: 14,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   Text(
-                                    teacher.country ?? "",
+                                    countryName,
                                     style: LettutorFontStyles.descriptionText
                                         .copyWith(
                                             color: const Color.fromRGBO(
@@ -258,12 +281,14 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                   ),
                   Wrap(
                     children: [
-                      ...(teacher.languages ?? "")
-                          .split(",")
-                          .map((e) => SkillTag(
-                                skill: getCountryNameFromCode(e) ?? "",
-                                selected: true,
-                              ))
+                      ...(teacherDetail.languages ?? "").split(",").map((e) {
+                        String language = getLanguageName(e);
+
+                        return SkillTag(
+                          skill: language,
+                          selected: true,
+                        );
+                      }),
                     ],
                   ),
                   Text(

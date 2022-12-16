@@ -5,6 +5,7 @@ import 'package:let_tutor/pages/teachers/TeacherDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
+import 'package:let_tutor/utils/data/country.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
 import 'package:let_tutor/utils/util_function.dart';
@@ -27,17 +28,20 @@ class TeacherCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget avatarWidget = DefaultAvatar(teacherName: teacher.name ?? "");
     if (teacher.avatar != null) {
-      if (teacher.avatar!.indexOf("avatar-default") < 0) {
+      if (!teacher.avatar!.contains("avatar-default")) {
         avatarWidget = Image.network(
           teacher.avatar!,
           fit: BoxFit.fitHeight,
         );
       }
     }
+
+    Country? country = getCountryByCodeName(teacher.country ?? "");
     String countryName = "";
-    if (teacher.country != null) {
-      countryName = getCountryNameFromCode(teacher.country!) ?? "";
+    if (country != null) {
+      countryName = country.name ?? "";
     }
+
     bool hasReview = (teacher.feedbacks ?? []).length > 0;
     return Container(
       decoration: BoxDecoration(
@@ -92,9 +96,23 @@ class TeacherCard extends StatelessWidget {
                                 Container(
                                   height: 18,
                                   width: 24,
+                                  margin: const EdgeInsets.only(right: 4.0),
                                   child: SvgPicture.network(
-                                    'https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.3/flags/4x3/${(teacher.country ?? "VN").toLowerCase()}.svg',
+                                    'https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.3/flags/4x3/${(teacher.country ?? "").toLowerCase()}.svg',
                                     fit: BoxFit.cover,
+                                    placeholderBuilder: (context) => Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Colors.black
+                                                  .withOpacity(0.85),
+                                              width: 1)),
+                                      height: 4,
+                                      width: 3,
+                                      child: const Icon(
+                                        Icons.broken_image,
+                                        size: 14,
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Text(
@@ -215,24 +233,23 @@ class TeacherCard extends StatelessWidget {
       ]),
     );
   }
+}
 
-  Widget DefaultAvatar({String teacherName = "", int size = 20}) {
-    var names = teacherName.split(" ");
-    while (names.length < 2) {
-      names.add(" ");
-    }
-    String defaultString =
-        names[0].toUpperCase()[0] + names[1].toUpperCase()[0];
-    return Container(
-      height: 60,
-      width: 60,
-      color: Colors.blue,
-      child: Center(
-        child: Text(
-          defaultString,
-          style: LettutorFontStyles.defaultAvatarText,
-        ),
-      ),
-    );
+Widget DefaultAvatar({String teacherName = "", int size = 20}) {
+  var names = teacherName.split(" ");
+  while (names.length < 2) {
+    names.add(" ");
   }
+  String defaultString = names[0].toUpperCase()[0] + names[1].toUpperCase()[0];
+  return Container(
+    height: 60,
+    width: 60,
+    color: Colors.blue,
+    child: Center(
+      child: Text(
+        defaultString,
+        style: LettutorFontStyles.defaultAvatarText,
+      ),
+    ),
+  );
 }

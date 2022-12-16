@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/components/dropdown/gf_multiselect.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:intl/intl.dart';
 
 import 'package:let_tutor/handler/course/course_controller.dart';
+import 'package:let_tutor/handler/schedule/schedule_controller.dart';
 import 'package:let_tutor/handler/tutor/teacher_controller.dart';
+import 'package:let_tutor/models/schedule/booking_history.dart';
 import 'package:let_tutor/models/teacher/teacher.dart';
 import 'package:let_tutor/pages/conference/VideoConference.dart';
 import 'package:let_tutor/utils/components/common.dart';
@@ -12,6 +16,7 @@ import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
 import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 import 'TeacherPagination.dart';
 
@@ -23,6 +28,7 @@ class ListTeacherPage extends StatefulWidget {
 }
 
 class _ListTeacherPageState extends State<ListTeacherPage> {
+  BookingSchedule? nextSchedule;
   var skills = [
     "All",
     "For Studing Abroad",
@@ -44,6 +50,8 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
   var favoriteTecher = [];
   List<Teacher> teacherList = [];
 
+  int lessonTotalTime = 0;
+
   @override
   void initState() {
     super.initState();
@@ -55,11 +63,24 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
         });
       },
     );
+    ScheduleController.getNextLesson().then((value) {
+      setState(() {
+        nextSchedule = value;
+        if (value != null) {
+          print(nextSchedule);
+        }
+      });
+    });
+    ScheduleController.getLessonTotalTime().then((value) {
+      setState(() {
+        lessonTotalTime = value;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    bool hasLesson = true;
+    bool hasLesson = nextSchedule != null;
 
     return Scaffold(
         appBar: const LettutorAppBar(),
@@ -82,22 +103,80 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(
-                          'You have no upcoming lesson.',
-                          style: LettutorFontStyles.tagSelectedText.copyWith(
-                            color: Colors.white,
-                            fontSize: 30,
+                        Container(
+                          margin: const EdgeInsets.all(10.0),
+                          alignment: Alignment.center,
+                          child: Text(
+                            hasLesson
+                                ? 'Upcoming lesson'
+                                : 'You have no upcoming lesson.',
+                            style: LettutorFontStyles.nextLessonText.copyWith(
+                              fontSize: 30,
+                            ),
                           ),
                         ),
                         hasLesson
+                            ? const SizedBox()
+                            : Text(
+                                "Welcome to LetTutor",
+                                style:
+                                    LettutorFontStyles.nextLessonText.copyWith(
+                                  fontSize: 16,
+                                ),
+                              ),
+                        hasLesson
                             ? Row(
                                 children: [
-                                  Text(
-                                    'Sun, 23 Oct 22 00:00 - 00:25',
-                                    maxLines: 4,
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width /
+                                                2),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "${DateFormat("EEE, d MMM yy HH:mm").format(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                nextSchedule!
+                                                        .scheduleDetailInfo!
+                                                        .startPeriodTimestamp ??
+                                                    0),
+                                          )} - ${convertTimeStampToHour(nextSchedule!.scheduleDetailInfo!.endPeriodTimestamp ?? 0)}",
+                                          style: LettutorFontStyles
+                                              .nextLessonText
+                                              .copyWith(
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        CountdownTimer(
+                                          endTime: nextSchedule!
+                                                  .scheduleDetailInfo!
+                                                  .endPeriodTimestamp ??
+                                              0 -
+                                                  DateTime.now()
+                                                      .microsecondsSinceEpoch,
+                                          widgetBuilder: (context, time) {
+                                            String timeString = (time!.hours ??
+                                                        0) <
+                                                    10
+                                                ? "0${time.hours}"
+                                                : "${time.hours}:${(time.min ?? 0) < 10 ? "0${time.min}" : "${time.min}"}:${(time.sec ?? 0) < 10 ? "0${time.sec}" : "${time.sec}"}";
+                                            return Text(
+                                              "(start in $timeString)",
+                                              style: LettutorFontStyles
+                                                  .nextLessonText
+                                                  .copyWith(
+                                                      color: Colors.yellow),
+                                            );
+                                          },
+                                        )
+                                      ],
+                                    ),
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      print(nextSchedule!.studentMeetingLink ??
+                                          "");
                                       PushTo(
                                           context: context,
                                           destination: VideoConferencePage());
@@ -125,14 +204,15 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                   )
                                 ],
                               )
-                            : Text(
-                                'Total lesson time is 3 hours 20 minutes',
-                                style:
-                                    LettutorFontStyles.tagSelectedText.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              )
+                            : const SizedBox(
+                                height: 20,
+                              ),
+                        Text(
+                          'Total lesson time is ${(lessonTotalTime / 60).ceil()} hours ${lessonTotalTime % 60} minutes',
+                          style: LettutorFontStyles.nextLessonText.copyWith(
+                            fontSize: 16,
+                          ),
+                        )
                       ],
                     ),
                   ),

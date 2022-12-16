@@ -7,6 +7,7 @@ import 'package:let_tutor/handler/auth/auth_controller.dart';
 import 'package:let_tutor/models/category.dart';
 import 'package:let_tutor/models/course/course.dart';
 import 'package:let_tutor/models/course/e_book.dart';
+import 'package:let_tutor/models/course/study_progress.dart';
 import 'package:let_tutor/utils/components/courses/CourseCard.dart';
 import 'package:let_tutor/utils/components/courses/EbookCard.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
@@ -99,5 +100,24 @@ class CourseController {
       res.addAll(ebooksMap[key]!);
     }
     return res;
+  }
+
+  static Future<LatestLearningDate?> getLatestLearning(String userID) async {
+    String requestUrl = "$baseUrl$_ebookPath/$userID/learning-progress";
+    LatestLearningDate? res;
+    Response respond = await ApiHandler.handler.get(
+      requestUrl,
+      options: ApiHandler.getHeaders(),
+    );
+
+    if (respond.statusCode == 200) {
+      var data = respond.data;
+      StudyProgress sp = StudyProgress.fromJson(data['data']);
+      if (sp.latestLearningDate != null) {
+        return sp.latestLearningDate![0];
+      }
+    }
+
+    return null;
   }
 }

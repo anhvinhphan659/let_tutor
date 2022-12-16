@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:country_codes/country_codes.dart';
+import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +22,6 @@ void main() async {
 Future initHandler() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
-  await CountryCodes.init();
 
   await DataHandler.initial();
   //generate util storage
@@ -33,6 +33,8 @@ Future initHandler() async {
     UtilStorage.testPreparations = value;
     print(value);
   });
+
+  UtilStorage.initCountryList();
 
   // ByteData data =
   //     await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');

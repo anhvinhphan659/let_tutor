@@ -1,18 +1,19 @@
 import 'package:country_codes/country_codes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:let_tutor/utils/data/country.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 
 String? getCountryNameFromCode(String countryCode) {
   countryCode = countryCode.toLowerCase();
   String countryName = "";
+  CountryDetails countryDetail;
   try {
-    countryName = CountryCodes.name(
-            locale: Locale(countryCode, countryCode.toUpperCase())) ??
-        "";
+    countryDetail = CountryCodes.detailsForLocale(Locale(countryCode));
+    return countryDetail.name ?? "";
   } catch (e) {
     print(e);
   }
-  return countryName;
 }
 
 String convertTimeStampToHour(int timeStamp) {
@@ -50,4 +51,22 @@ String getDifferenceTime(DateTime start, {DateTime? end}) {
   }
 
   return ret;
+}
+
+Country? getCountryByCodeName(String codeName) {
+  for (var country in UtilStorage.countries) {
+    if ((country.code ?? "") == codeName) {
+      return country;
+    }
+  }
+  return null;
+}
+
+String getLanguageName(String codeLanguage) {
+  for (var country in UtilStorage.countries) {
+    if (country.language != null) {
+      return country.language!.name ?? "";
+    }
+  }
+  return "";
 }

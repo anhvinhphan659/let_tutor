@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:let_tutor/models/schedule/booking_history.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
-import 'package:let_tutor/utils/models/Schedule.dart';
+
 import 'package:let_tutor/utils/styles/styles.dart';
 import 'package:let_tutor/utils/util_function.dart';
 

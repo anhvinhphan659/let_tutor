@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/models/user.dart';
 import 'package:let_tutor/pages/account/ChangePasswordPage.dart';
 import 'package:let_tutor/pages/account/ProfilePage.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
@@ -11,12 +12,25 @@ import 'package:let_tutor/pages/teachers/LettutorPageProfile.dart';
 import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
 
 import 'package:let_tutor/utils/components/common.dart';
+import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
+import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
+import 'package:let_tutor/utils/styles/styles.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    User user = UserController.currentUser;
+    Widget avatarWidget = DefaultAvatar(teacherName: user.name ?? "");
+    if (user.avatar != null) {
+      if (!user.avatar!.contains("avatar-default")) {
+        avatarWidget = Image.network(
+          user.avatar!,
+          fit: BoxFit.fill,
+        );
+      }
+    }
     final navigators = [
       {
         "icon": 'assets/icons/book-medical.svg',
@@ -128,11 +142,11 @@ class SettingPage extends StatelessWidget {
             UserController.getUserInformation();
             PushTo(context: context, destination: ProfilePage());
           },
-          leading: const CircleAvatar(
-            backgroundColor: Colors.grey,
-            radius: 20,
+          leading: StateAvatar(
+            backgroundRadius: 20,
+            child: avatarWidget,
           ),
-          title: Text('Khanh Nguyen'),
+          title: Text(user.name ?? "", style: LettutorFontStyles.settingText),
         ),
         ...navigators.map(
           (e) => ListTile(
@@ -143,8 +157,12 @@ class SettingPage extends StatelessWidget {
                 child: SvgPicture.asset(
                   e["icon"]!.toString(),
                   fit: BoxFit.fitHeight,
+                  color: Colors.blue,
                 )),
-            title: Text(e["screen"]!.toString()),
+            title: Text(
+              e["screen"]!.toString(),
+              style: LettutorFontStyles.settingText,
+            ),
           ),
         )
       ]),
