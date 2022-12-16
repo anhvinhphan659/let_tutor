@@ -44,21 +44,20 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
     _controller = VideoPlayerController.network(teacher.video ?? "");
 
-    TeacherController.getTeacherDetail(teacher.userId!).then((value) {
+    TeacherController.getTeacherDetail(teacher.userId!).then((value) async {
       setState(() {
         teacherDetail = value;
+        isFavorite = teacherDetail.isFavorite ?? false;
+
+        isLoading = false;
+      });
+      await _controller.initialize();
+      setState(() {
+        flickManager = FlickManager(videoPlayerController: _controller);
         isLoading = false;
       });
     });
 
-    isFavorite = teacherDetail.isFavorite ?? false;
-    // _controller.initialize().then((value) async {
-    //   setState(() {
-    //     flickManager = FlickManager(videoPlayerController: _controller);
-    //     isLoading = false;
-    //   });
-    // });
-    // ScheduleController.getScheduleByTutor(teacher.userId ?? "");
     getListScheduleInWeek();
 
     super.initState();
@@ -66,7 +65,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
   @override
   void dispose() {
-    // flickManager.dispose();
+    flickManager.dispose();
 
     super.dispose();
   }
@@ -259,22 +258,22 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                       )
                     ],
                   ),
-                  // SizedBox(
-                  //   height: 300,
-                  //   child: _controller.value.isInitialized
-                  //       ? FlickVideoPlayer(
-                  //           flickManager: flickManager,
-                  //           flickVideoWithControls:
-                  //               const FlickVideoWithControls(
-                  //             videoFit: BoxFit.fitHeight,
-                  //             controls: FlickPortraitControls(),
-                  //           ),
-                  //         )
-                  //       : const Center(
-                  //           child: CircularProgressIndicator(
-                  //           color: Colors.grey,
-                  //         )),
-                  // ),
+                  SizedBox(
+                    height: 300,
+                    child: _controller.value.isInitialized
+                        ? FlickVideoPlayer(
+                            flickManager: flickManager,
+                            flickVideoWithControls:
+                                const FlickVideoWithControls(
+                              videoFit: BoxFit.fitHeight,
+                              controls: FlickPortraitControls(),
+                            ),
+                          )
+                        : const Center(
+                            child: CircularProgressIndicator(
+                            color: Colors.grey,
+                          )),
+                  ),
                   Text(
                     'Languages',
                     style: LettutorFontStyles.headerTeacherDetail,

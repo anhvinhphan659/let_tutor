@@ -181,7 +181,7 @@ class ScheduleController {
     );
 
     if (respond.statusCode == 200) {
-      return respond.data as int;
+      return respond.data['total'] as int;
     }
     return 0;
   }
