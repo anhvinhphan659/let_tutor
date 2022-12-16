@@ -48,20 +48,20 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Center(
                     child: Text(
-                      "Đăng nhập",
+                      "Say hello to your English tutors",
                       style: LettutorFontStyles.formTitle,
                     ),
                   ),
                   Center(
                     child: Text(
-                      'Phát triển kỹ năng tiếng Anh nhanh nhất bằng cách học 1 kèm 1 trực tuyến theo mục tiêu và lộ trình dành cho riêng bạn.',
+                      'Become fluent faster through one on one video chat lessons tailored to your goals.',
                       style: LettutorFontStyles.formDescription,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
                     child: Text(
-                      'ĐỊA CHỈ EMAIL',
+                      'EMAIL',
                       style: LettutorFontStyles.formLabel,
                     ),
                   ),
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 24.0, bottom: 8.0),
                     child:
-                        Text('MẬT KHẨU', style: LettutorFontStyles.formLabel),
+                        Text('PASSWORD', style: LettutorFontStyles.formLabel),
                   ),
                   Container(
                     padding: const EdgeInsets.only(bottom: 16.0),
@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10.0),
                     child: TextButton(
-                      child: Text('Quên mật khẩu?',
+                      child: Text('Forgot Password?',
                           style: LettutorFontStyles.normalText.copyWith(
                             color: LettutorColors.lightBlueColor,
                           )),
@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       child: Center(
                         child: Text(
-                          "ĐĂNG NHẬP",
+                          "LOG IN",
                           style: LettutorFontStyles.formDescription.copyWith(
                             fontSize: 20,
                             color: Colors.white,
@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.only(top: 34.0),
                     child: Center(
                       child: Text(
-                        'Hoặc tiếp tục với',
+                        'Or continue with',
                         style: LettutorFontStyles.normalText,
                       ),
                     ),
@@ -173,11 +173,11 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Chưa có tài khoản?',
+                          'Not a member yet?',
                           style: LettutorFontStyles.normalText,
                         ),
                         TextButton(
-                          child: Text('Đăng ký',
+                          child: Text('Sign up',
                               style: LettutorFontStyles.normalText.copyWith(
                                 color: LettutorColors.lightBlueColor,
                               )),

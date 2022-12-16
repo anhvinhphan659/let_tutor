@@ -1,6 +1,7 @@
 import 'package:country_codes/country_codes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 import 'package:let_tutor/utils/data/country.dart';
 import 'package:let_tutor/utils/data/util_storage.dart';
 
@@ -65,8 +66,16 @@ Country? getCountryByCodeName(String codeName) {
 String getLanguageName(String codeLanguage) {
   for (var country in UtilStorage.countries) {
     if (country.language != null) {
-      return country.language!.name ?? "";
+      if (country.language!.code == codeLanguage) {
+        return country.language!.name ?? "";
+      }
     }
   }
   return "";
+}
+
+Map<String, dynamic> getJsonFromToken(String token) {
+  Map<String, dynamic> payload = Jwt.parseJwt(token);
+
+  return payload;
 }

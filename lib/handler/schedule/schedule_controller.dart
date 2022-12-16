@@ -98,7 +98,6 @@ class ScheduleController {
             if (k.toString().contains("MeetingLink")) {
               continue;
             }
-            print(k + ":" + d[k]);
           }
         }
       }

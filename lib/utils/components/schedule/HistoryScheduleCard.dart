@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:let_tutor/models/schedule/booking_history.dart';
+import 'package:let_tutor/pages/conference/VideoConference.dart';
+import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
@@ -26,6 +28,8 @@ class _HistoryScheduleCardState extends State<HistoryScheduleCard> {
     var feedBacks = schedule.feedbacks ?? <Feedbacks>[];
     DateTime startTime = DateTime.fromMillisecondsSinceEpoch(
         scheduleDetail.startPeriodTimestamp ?? 0);
+    bool canMeeting = DateTime.now().millisecondsSinceEpoch >
+        (scheduleDetail.endPeriodTimestamp ?? 0);
     return Container(
       margin: const EdgeInsets.only(top: 24),
       padding: const EdgeInsets.all(12.0),
@@ -212,7 +216,7 @@ class _HistoryScheduleCardState extends State<HistoryScheduleCard> {
                     ),
                   ),
           ),
-          feedBacks.length == 0
+          feedBacks.isEmpty
               ? Container(
                   margin: const EdgeInsets.only(bottom: 1),
                   color: Colors.white,
@@ -231,6 +235,22 @@ class _HistoryScheduleCardState extends State<HistoryScheduleCard> {
                 )
               : const SizedBox(),
           ...feedBacks.map((e) => FeedBackWidget(e)),
+          canMeeting
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        PushTo(
+                            context: context,
+                            destination: VideoConferencePage(
+                                meetingLink: schedule.studentMeetingLink));
+                      },
+                      child: Text('Go to meeting'),
+                    )
+                  ],
+                )
+              : const SizedBox()
         ],
       ),
     );

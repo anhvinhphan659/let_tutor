@@ -88,8 +88,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       childrenPadding: const EdgeInsets.symmetric(
                           horizontal: 35, vertical: 25),
                       title: Text(
-                        'Account',
-                        style: LettutorFontStyles.normalText,
+                        'Change password',
+                        style: LettutorFontStyles.h5Text,
                       ),
                       children: [
                         UserTitleHeader("Password"),

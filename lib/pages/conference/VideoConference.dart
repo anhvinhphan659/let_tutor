@@ -4,16 +4,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
 import 'package:let_tutor/utils/components/common.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 class VideoConferencePage extends StatefulWidget {
-  const VideoConferencePage({Key? key}) : super(key: key);
+  String? meetingLink;
+  VideoConferencePage({this.meetingLink, Key? key}) : super(key: key);
 
   @override
   State<VideoConferencePage> createState() => _VideoConferencePageState();
 }
 
 class _VideoConferencePageState extends State<VideoConferencePage> {
-  final serverText = TextEditingController();
+  final serverText = TextEditingController(text: "https://meet.lettutor.com");
   final roomText = TextEditingController(text: "plugintestroom");
   final subjectText = TextEditingController(text: "My Plugin Test Meeting");
   final nameText = TextEditingController(text: "Plugin Test User");
@@ -27,6 +29,27 @@ class _VideoConferencePageState extends State<VideoConferencePage> {
   @override
   void initState() {
     super.initState();
+    String? meetingLink = widget.meetingLink;
+    if (meetingLink != null) {
+      String token = meetingLink.substring("/call/?token=".length);
+      Map<String, dynamic> jitsiData = getJsonFromToken(token);
+      //get data
+      String roomID = jitsiData['room'] ?? "";
+      String roomName = jitsiData['roomName'] ?? "";
+      String email = jitsiData['userCall']['email'] ?? "";
+      String userName = jitsiData['userCall']['name'] ?? "";
+
+      print("Data from json");
+      print(roomID);
+      print(roomName);
+      print(email);
+      print(userName);
+      //set data
+      roomText.text = roomID;
+      subjectText.text = roomName;
+      emailText.text = email;
+      nameText.text = userName;
+    }
     JitsiMeet.addListener(JitsiMeetingListener(
         onConferenceWillJoin: _onConferenceWillJoin,
         onConferenceJoined: _onConferenceJoined,
@@ -69,7 +92,7 @@ class _VideoConferencePageState extends State<VideoConferencePage> {
                                 width: width * 0.60 * 0.70,
                                 height: width * 0.60 * 0.70,
                                 child: JitsiMeetConferencing(
-                                  extraJS: [
+                                  extraJS: const [
                                     // extraJs setup example
                                     '<script>function echo(){console.log("echo!!!")};</script>',
                                     '<script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>'
@@ -92,66 +115,6 @@ class _VideoConferencePageState extends State<VideoConferencePage> {
           SizedBox(
             height: 16.0,
           ),
-          // TextField(
-          //   controller: serverText,
-          //   decoration: InputDecoration(
-          //       border: OutlineInputBorder(),
-          //       labelText: "Server URL",
-          //       hintText: "Hint: Leave empty for meet.jitsi.si"),
-          // ),
-          // SizedBox(
-          //   height: 14.0,
-          // ),
-          // TextField(
-          //   controller: roomText,
-          //   decoration: InputDecoration(
-          //     border: OutlineInputBorder(),
-          //     labelText: "Room",
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 14.0,
-          // ),
-          // TextField(
-          //   controller: subjectText,
-          //   decoration: InputDecoration(
-          //     border: OutlineInputBorder(),
-          //     labelText: "Subject",
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 14.0,
-          // ),
-          // TextField(
-          //   controller: nameText,
-          //   decoration: InputDecoration(
-          //     border: OutlineInputBorder(),
-          //     labelText: "Display Name",
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 14.0,
-          // ),
-          // TextField(
-          //   controller: emailText,
-          //   decoration: InputDecoration(
-          //     border: OutlineInputBorder(),
-          //     labelText: "Email",
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 14.0,
-          // ),
-          // TextField(
-          //   controller: iosAppBarRGBAColor,
-          //   decoration: InputDecoration(
-          //       border: OutlineInputBorder(),
-          //       labelText: "AppBar Color(IOS only)",
-          //       hintText: "Hint: This HAS to be in HEX RGBA format"),
-          // ),
-          // SizedBox(
-          //   height: 14.0,
-          // ),
           CheckboxListTile(
             title: Text("Audio Only"),
             value: isAudioOnly,

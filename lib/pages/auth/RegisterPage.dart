@@ -41,20 +41,20 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   Center(
                     child: Text(
-                      "Đăng ký",
+                      "Start learning with LetTutor",
                       style: LettutorFontStyles.formTitle,
                     ),
                   ),
                   Center(
                     child: Text(
-                      'Phát triển kỹ năng tiếng Anh nhanh nhất bằng cách học 1 kèm 1 trực tuyến theo mục tiêu và lộ trình dành cho riêng bạn.',
+                      'Become fluent faster through one on one video chat lessons tailored to your goals.',
                       style: LettutorFontStyles.formDescription,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
                     child: Text(
-                      'ĐỊA CHỈ EMAIL',
+                      'EMAIL',
                       style: LettutorFontStyles.formLabel,
                     ),
                   ),
@@ -76,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 24.0, bottom: 8.0),
                     child:
-                        Text('MẬT KHẨU', style: LettutorFontStyles.formLabel),
+                        Text('PASSWORD', style: LettutorFontStyles.formLabel),
                   ),
                   Container(
                     padding: const EdgeInsets.only(bottom: 16.0),
@@ -105,7 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       onPressed: () {},
                       child: Center(
                         child: Text(
-                          "ĐĂNG NHẬP",
+                          "SIGN UP",
                           style: LettutorFontStyles.formDescription.copyWith(
                             fontSize: 20,
                             color: Colors.white,
@@ -118,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     padding: const EdgeInsets.only(top: 34.0),
                     child: Center(
                       child: Text(
-                        'Hoặc tiếp tục với',
+                        'Or continue with',
                         style: LettutorFontStyles.normalText,
                       ),
                     ),
@@ -143,11 +143,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Đã tài khoản?',
+                          'Already have an account?',
                           style: LettutorFontStyles.normalText,
                         ),
                         TextButton(
-                          child: Text('Đăng nhập',
+                          child: Text('Log in',
                               style: LettutorFontStyles.normalText.copyWith(
                                 color: LettutorColors.lightBlueColor,
                               )),

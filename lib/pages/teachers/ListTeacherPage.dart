@@ -81,7 +81,13 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
   @override
   Widget build(BuildContext context) {
     bool hasLesson = nextSchedule != null;
-
+    if (hasLesson) {
+      //check lesson pass
+      if (DateTime.now().millisecondsSinceEpoch >
+          (nextSchedule!.scheduleDetailInfo!.endPeriodTimestamp ?? 0)) {
+        hasLesson = false;
+      }
+    }
     return Scaffold(
         appBar: const LettutorAppBar(),
         body: isLoading
@@ -118,7 +124,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                         hasLesson
                             ? const SizedBox()
                             : Text(
-                                "Welcome to LetTutor",
+                                "Welcome to LetTutor!",
                                 style:
                                     LettutorFontStyles.nextLessonText.copyWith(
                                   fontSize: 16,
@@ -156,6 +162,9 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                                   DateTime.now()
                                                       .microsecondsSinceEpoch,
                                           widgetBuilder: (context, time) {
+                                            if (time == null) {
+                                              return Text("");
+                                            }
                                             String timeString = (time!.hours ??
                                                         0) <
                                                     10
@@ -207,12 +216,15 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                             : const SizedBox(
                                 height: 20,
                               ),
-                        Text(
-                          'Total lesson time is ${(lessonTotalTime / 60).ceil()} hours ${lessonTotalTime % 60} minutes',
-                          style: LettutorFontStyles.nextLessonText.copyWith(
-                            fontSize: 16,
-                          ),
-                        )
+                        hasLesson
+                            ? Text(
+                                'Total lesson time is ${(lessonTotalTime / 60).ceil()} hours ${lessonTotalTime % 60} minutes',
+                                style:
+                                    LettutorFontStyles.nextLessonText.copyWith(
+                                  fontSize: 16,
+                                ),
+                              )
+                            : const SizedBox()
                       ],
                     ),
                   ),

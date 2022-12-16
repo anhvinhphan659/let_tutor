@@ -11,6 +11,8 @@ import 'package:let_tutor/pages/account/SettingPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/BookingTable.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
+import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
+import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
 import 'package:let_tutor/utils/data/country.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
@@ -36,11 +38,14 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
   bool isFavorite = false;
   bool isLoading = true;
+
+  bool videoLoading = true;
   DateTime initialDate = DateTime.now();
 
   @override
   void initState() {
     teacher = widget.teacher;
+    print("Teacher video: ${teacher.video ?? ""}");
 
     _controller = VideoPlayerController.network(teacher.video ?? "");
 
@@ -48,16 +53,16 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
       setState(() {
         teacherDetail = value;
         isFavorite = teacherDetail.isFavorite ?? false;
-
-        isLoading = false;
-      });
-      await _controller.initialize();
-      setState(() {
-        flickManager = FlickManager(videoPlayerController: _controller);
         isLoading = false;
       });
     });
 
+    _controller.initialize().then((value) {
+      flickManager = FlickManager(videoPlayerController: _controller);
+      setState(() {
+        videoLoading = false;
+      });
+    });
     getListScheduleInWeek();
 
     super.initState();
@@ -72,6 +77,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
   void getListScheduleInWeek() {
     print("call schefule controller");
+
     ScheduleController.getScheduleByTutor(teacher.userId!,
             startTime: initialDate)
         .then((value) {
@@ -90,6 +96,16 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
     if (country != null) {
       countryName = country.name ?? "";
     }
+    Widget avatarWidget = DefaultAvatar(teacherName: teacher.name ?? "");
+    if (teacher.avatar != null) {
+      if (!teacher.avatar!.contains("avatar-default")) {
+        avatarWidget = Image.network(
+          teacher.avatar!,
+          fit: BoxFit.fitHeight,
+        );
+      }
+    }
+
     return Scaffold(
       appBar: LettutorAppBar(),
       body: isLoading
@@ -107,14 +123,12 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                       children: [
                         Column(
                           children: [
-                            ClipOval(
-                              child: SizedBox.fromSize(
-                                size: const Size.fromRadius(35),
-                                child: Image.asset(
-                                  'assets/images/teacher1.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                            StateAvatar(
+                              foregroundRadius: 5,
+                              backgroundRadius: 30,
+                              dx: 46,
+                              displayTop: teacher.isActivated ?? false,
+                              child: avatarWidget,
                             ),
                           ],
                         ),
@@ -162,26 +176,31 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                                   )
                                 ],
                               ),
-                              Row(
-                                children: [
-                                  ...List.generate(
-                                    (teacher.rating ?? 0.0).floor(),
-                                    (_) => const Icon(
-                                      Icons.star,
-                                      color: Colors.yellow,
-                                      size: 12,
-                                    ),
-                                  ),
-                                  ...List.generate(
-                                    (5 - (teacher.rating ?? 0.0).floor()),
-                                    (_) => const Icon(
-                                      Icons.star,
-                                      color: Colors.grey,
-                                      size: 12,
-                                    ),
-                                  ),
-                                ],
-                              )
+                              (teacherDetail.totalFeedback ?? 0) == 0
+                                  ? Text(
+                                      "No reviews yet",
+                                      style: LettutorFontStyles.reviewText,
+                                    )
+                                  : Row(
+                                      children: [
+                                        ...List.generate(
+                                          (teacher.rating ?? 0.0).floor(),
+                                          (_) => const Icon(
+                                            Icons.star,
+                                            color: Colors.yellow,
+                                            size: 12,
+                                          ),
+                                        ),
+                                        ...List.generate(
+                                          (5 - (teacher.rating ?? 0.0).floor()),
+                                          (_) => const Icon(
+                                            Icons.star,
+                                            color: Colors.grey,
+                                            size: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    )
                             ],
                           ),
                         )
@@ -260,19 +279,19 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                   ),
                   SizedBox(
                     height: 300,
-                    child: _controller.value.isInitialized
-                        ? FlickVideoPlayer(
+                    child: videoLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                            color: Colors.grey,
+                          ))
+                        : FlickVideoPlayer(
                             flickManager: flickManager,
                             flickVideoWithControls:
                                 const FlickVideoWithControls(
                               videoFit: BoxFit.fitHeight,
                               controls: FlickPortraitControls(),
                             ),
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(
-                            color: Colors.grey,
-                          )),
+                          ),
                   ),
                   Text(
                     'Languages',

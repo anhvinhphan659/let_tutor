@@ -27,7 +27,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               children: [
                 Center(
                   child: Text(
-                    'Đặt lại mật khẩu',
+                    'Reset password',
                     style: LettutorFontStyles.largeLabelText,
                   ),
                 ),
@@ -61,7 +61,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           const BorderRadius.all(Radius.circular(6.0))),
                   child: TextButton(
                     child: Text(
-                      'Xác nhận',
+                      'Confirm',
                       style: LettutorFontStyles.normalText
                           .copyWith(color: Colors.white),
                     ),
