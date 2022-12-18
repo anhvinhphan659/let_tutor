@@ -6,6 +6,7 @@ import 'package:let_tutor/handler/api_handler.dart';
 import 'package:let_tutor/handler/auth/auth_controller.dart';
 import 'package:let_tutor/models/category.dart';
 import 'package:let_tutor/models/course/course.dart';
+import 'package:let_tutor/models/course/course_detail.dart';
 import 'package:let_tutor/models/course/e_book.dart';
 import 'package:let_tutor/models/course/study_progress.dart';
 import 'package:let_tutor/utils/components/courses/CourseCard.dart';
@@ -118,6 +119,20 @@ class CourseController {
       }
     }
 
+    return null;
+  }
+
+  static Future<CourseDetail?> getCourseDetailByID(String courseID) async {
+    String requestUrl = "$baseUrl$_coursePath/$courseID";
+
+    Response respond = await ApiHandler.handler.get(
+      requestUrl,
+      options: ApiHandler.getHeaders(),
+    );
+    if (respond.statusCode == 200) {
+      var data = respond.data;
+      return CourseDetail.fromJson(data['data']);
+    }
     return null;
   }
 }

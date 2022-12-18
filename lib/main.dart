@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:country_codes/country_codes.dart';
-import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

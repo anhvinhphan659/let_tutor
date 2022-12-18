@@ -89,7 +89,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           horizontal: 35, vertical: 25),
                       title: Text(
                         'Change password',
-                        style: LettutorFontStyles.h5Text,
+                        style: LettutorFontStyles.h5Title,
                       ),
                       children: [
                         UserTitleHeader("Password"),

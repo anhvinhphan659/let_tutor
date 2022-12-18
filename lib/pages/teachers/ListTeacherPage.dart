@@ -5,7 +5,6 @@ import 'package:getwidget/components/dropdown/gf_multiselect.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:intl/intl.dart';
 
-import 'package:let_tutor/handler/course/course_controller.dart';
 import 'package:let_tutor/handler/schedule/schedule_controller.dart';
 import 'package:let_tutor/handler/tutor/teacher_controller.dart';
 import 'package:let_tutor/models/schedule/booking_history.dart';
@@ -188,7 +187,11 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                           "");
                                       PushTo(
                                           context: context,
-                                          destination: VideoConferencePage());
+                                          destination: VideoConferencePage(
+                                            meetingLink: nextSchedule!
+                                                    .studentMeetingLink ??
+                                                "",
+                                          ));
                                     },
                                     child: Container(
                                         padding: EdgeInsets.symmetric(
@@ -218,7 +221,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                               ),
                         hasLesson
                             ? Text(
-                                'Total lesson time is ${(lessonTotalTime / 60).ceil()} hours ${lessonTotalTime % 60} minutes',
+                                'Total lesson time is ${(lessonTotalTime / 60).floor()} hours ${lessonTotalTime % 60} minutes',
                                 style:
                                     LettutorFontStyles.nextLessonText.copyWith(
                                   fontSize: 16,

@@ -1,21 +1,9 @@
-import 'package:country_codes/country_codes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:let_tutor/utils/data/country.dart';
 import 'package:let_tutor/utils/data/util_storage.dart';
-
-String? getCountryNameFromCode(String countryCode) {
-  countryCode = countryCode.toLowerCase();
-  String countryName = "";
-  CountryDetails countryDetail;
-  try {
-    countryDetail = CountryCodes.detailsForLocale(Locale(countryCode));
-    return countryDetail.name ?? "";
-  } catch (e) {
-    print(e);
-  }
-}
+import 'package:url_launcher/url_launcher.dart';
 
 String convertTimeStampToHour(int timeStamp) {
   DateTime dt = DateTime.fromMillisecondsSinceEpoch(timeStamp);
@@ -78,4 +66,12 @@ Map<String, dynamic> getJsonFromToken(String token) {
   Map<String, dynamic> payload = Jwt.parseJwt(token);
 
   return payload;
+}
+
+Future<void> displayURL(String _url) async {
+  if (!await launchUrl(Uri.parse(
+    _url,
+  ))) {
+    throw 'Could not launch $_url';
+  }
 }

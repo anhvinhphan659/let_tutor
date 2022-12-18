@@ -1,3 +1,5 @@
+import 'package:let_tutor/models/course/course_detail.dart';
+
 class Teacher {
   String? level;
   String? email;
@@ -365,4 +367,8 @@ class FirstInfo {
     data['studentGroupId'] = this.studentGroupId;
     return data;
   }
+}
+
+Teacher convertTeacherFromSuggestedTeacher(SuggestTeacher suggestTeacher) {
+  return Teacher.fromJson(suggestTeacher.toJson());
 }

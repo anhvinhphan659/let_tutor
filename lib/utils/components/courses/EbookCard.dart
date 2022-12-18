@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:let_tutor/pages/courses/CourseDetailPage.dart';
-import 'package:let_tutor/utils/components/common.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
 
@@ -28,6 +28,9 @@ class EBookCard extends StatelessWidget {
     // int numberLesson = (ebook.topics ?? []).length;
     return GestureDetector(
       onTap: () {
+        if (ebook.fileUrl != null) {
+          displayURL(ebook.fileUrl!);
+        }
         // PushTo(context: context, destination: CourseDetail(course: ebook));
       },
       child: Container(

@@ -6,12 +6,6 @@
 
 #import "GeneratedPluginRegistrant.h"
 
-#if __has_include(<country_codes/CountryCodesPlugin.h>)
-#import <country_codes/CountryCodesPlugin.h>
-#else
-@import country_codes;
-#endif
-
 #if __has_include(<jitsi_meet/JitsiMeetPlugin.h>)
 #import <jitsi_meet/JitsiMeetPlugin.h>
 #else
@@ -22,6 +16,12 @@
 #import <shared_preferences_ios/FLTSharedPreferencesPlugin.h>
 #else
 @import shared_preferences_ios;
+#endif
+
+#if __has_include(<url_launcher_ios/FLTURLLauncherPlugin.h>)
+#import <url_launcher_ios/FLTURLLauncherPlugin.h>
+#else
+@import url_launcher_ios;
 #endif
 
 #if __has_include(<video_player_avfoundation/FLTVideoPlayerPlugin.h>)
@@ -39,9 +39,9 @@
 @implementation GeneratedPluginRegistrant
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
-  [CountryCodesPlugin registerWithRegistrar:[registry registrarForPlugin:@"CountryCodesPlugin"]];
   [JitsiMeetPlugin registerWithRegistrar:[registry registrarForPlugin:@"JitsiMeetPlugin"]];
   [FLTSharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTSharedPreferencesPlugin"]];
+  [FLTURLLauncherPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTURLLauncherPlugin"]];
   [FLTVideoPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTVideoPlayerPlugin"]];
   [WakelockPlugin registerWithRegistrar:[registry registrarForPlugin:@"WakelockPlugin"]];
 }

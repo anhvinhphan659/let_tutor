@@ -22,7 +22,7 @@ import 'package:video_player/video_player.dart';
 class TeacherDetailPage extends StatefulWidget {
   final Teacher teacher;
 
-  TeacherDetailPage({required this.teacher, Key? key}) : super(key: key);
+  const TeacherDetailPage({required this.teacher, Key? key}) : super(key: key);
 
   @override
   State<TeacherDetailPage> createState() => _TeacherDetailPageState();
@@ -445,7 +445,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
       children: [
         Text(
           tdc.name ?? "",
-          style: LettutorFontStyles.h5Text,
+          style: LettutorFontStyles.h5Title,
         ),
         TextButton(
             onPressed: () {

@@ -16,11 +16,6 @@ public final class GeneratedPluginRegistrant {
   private static final String TAG = "GeneratedPluginRegistrant";
   public static void registerWith(@NonNull FlutterEngine flutterEngine) {
     try {
-      flutterEngine.getPlugins().add(new com.miguelruivo.flutter.plugin.countrycodes.country_codes.CountryCodesPlugin());
-    } catch(Exception e) {
-      Log.e(TAG, "Error registering plugin country_codes, com.miguelruivo.flutter.plugin.countrycodes.country_codes.CountryCodesPlugin", e);
-    }
-    try {
       flutterEngine.getPlugins().add(new com.gunschu.jitsi_meet.JitsiMeetPlugin());
     } catch(Exception e) {
       Log.e(TAG, "Error registering plugin jitsi_meet, com.gunschu.jitsi_meet.JitsiMeetPlugin", e);
@@ -29,6 +24,11 @@ public final class GeneratedPluginRegistrant {
       flutterEngine.getPlugins().add(new io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin());
     } catch(Exception e) {
       Log.e(TAG, "Error registering plugin shared_preferences_android, io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin", e);
+    }
+    try {
+      flutterEngine.getPlugins().add(new io.flutter.plugins.urllauncher.UrlLauncherPlugin());
+    } catch(Exception e) {
+      Log.e(TAG, "Error registering plugin url_launcher_android, io.flutter.plugins.urllauncher.UrlLauncherPlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.videoplayer.VideoPlayerPlugin());

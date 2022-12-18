@@ -367,7 +367,7 @@ Widget UserTitleHeader(String title, {bool isCompulsory = true}) {
                 style:
                     LettutorFontStyles.normalText.copyWith(color: Colors.red))
             : const TextSpan(text: ''),
-        TextSpan(text: title, style: LettutorFontStyles.h5Text)
+        TextSpan(text: title, style: LettutorFontStyles.h5Title)
       ]),
     ),
   );

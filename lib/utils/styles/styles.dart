@@ -128,7 +128,7 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(120, 120, 120, 1.0),
       height: 1.45);
-  static TextStyle h5Text = const TextStyle(
+  static TextStyle h5Title = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w600,
       fontFamily: 'Roboto, sans-serif',
