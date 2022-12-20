@@ -6,8 +6,11 @@ import 'package:let_tutor/models/course/course.dart';
 import 'package:let_tutor/models/course/e_book.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/courses/CourseCard.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class ListCoursePage extends StatefulWidget {
   const ListCoursePage({Key? key}) : super(key: key);
@@ -52,32 +55,35 @@ class _ListCoursePageState extends State<ListCoursePage> {
       "Pre-Advanced",
       "Advanced",
     ],
-    [
-      "For Studing Abroad",
-      "English for Kid",
-      "English for Traveling",
-      "Conversational English",
-      "Business English",
-      "STARTERS",
-      "MOVERS",
-      "FLYERS",
-      "KET",
-      "PET",
-      "IELTS",
-      "TOEFL",
-      "TOEIC",
-    ],
-    [
-      "Level decreasing",
-      "Level increasing",
-    ]
   ];
+
+  var levels = [
+    "Any Level",
+    "Beginner",
+    "Higher Beginner",
+    "Pre-Intermediate",
+    "Intermediate",
+    "Upper-Intermediate",
+    "Pre-Advanced",
+    "Advanced",
+  ];
+
+  var categories = [
+    ...UtilStorage.learnTopics,
+    ...UtilStorage.testPreparations,
+  ];
+
+  var sortSelections = {
+    "Level Descreasing": 0,
+    "Level Increasing": 1,
+  };
   Map<String, List<Widget>> tabOptions = {
     "Course": [],
     "E-Book": [],
     "Interactive E-book": [],
   };
   String _selectedTab = 'Course';
+  int? _sortOptionSelected;
   @override
   Widget build(BuildContext context) {
     // var screenWidth = MediaQuery.of(context).size.width;
@@ -85,10 +91,12 @@ class _ListCoursePageState extends State<ListCoursePage> {
 
     courseWidgets = tabOptions[_selectedTab] ?? [] as List<Widget>;
 
+    var screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      appBar: LettutorAppBar(),
+      appBar: const LettutorAppBar(),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
         color: Colors.white,
         child: ListView(
           shrinkWrap: true,
@@ -134,28 +142,66 @@ class _ListCoursePageState extends State<ListCoursePage> {
             ),
             Wrap(
               children: [
-                ...List.generate(
-                    searchOptionWidgets.length,
-                    (index) => Container(
-                          // decoration: BoxDecoration(
-                          //     border: Border.all(
-                          //         width: 1.0,
-                          //         color: LettutorColors.lightGrayColor)),
-                          padding: EdgeInsets.all(10),
-                          constraints: BoxConstraints(maxWidth: 175),
-                          child: GFMultiSelect(
-                            dropdownTitleTileBorder: Border.all(
-                                width: 1.0,
-                                color: LettutorColors.lightGrayColor),
-                            dropdownTitleTilePadding: EdgeInsets.zero,
-                            dropdownTitleTileMargin: EdgeInsets.zero,
-                            items: searchOptionWidgets[index],
-                            dropdownTitleTileHintText:
-                                searchOptionsHeaders[index],
-                            dropdownTitleTileText: "",
-                            onSelect: (value) {},
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(10),
+                  constraints: BoxConstraints(maxWidth: screenWidth * .8),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 1.0, color: LettutorColors.lightGrayColor)),
+                  child: MultiSelectDialogField(
+                    buttonText: Text("Select level"),
+                    title: Text("Select level"),
+                    // title: Text("Select category"),
+
+                    items: levels.map((e) => MultiSelectItem(e, e)).toList(),
+                    onConfirm: (val) {},
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(10),
+                  constraints: BoxConstraints(maxWidth: screenWidth * .8),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 1.0, color: LettutorColors.lightGrayColor)),
+                  child: MultiSelectDialogField(
+                    // title: Text("Select category"),
+                    buttonText: Text("Select category"),
+                    title: Text("Select category"),
+                    items: categories
+                        .map((e) => MultiSelectItem(e, e.name ?? ""))
+                        .toList(),
+                    onConfirm: (val) {},
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(10),
+                  constraints: BoxConstraints(maxWidth: screenWidth * 0.8),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 1.0, color: LettutorColors.lightGrayColor)),
+                  child: DropdownButton(
+                    isExpanded: true,
+                    underline: const SizedBox(),
+                    hint: Text("Sort by level"),
+                    items: sortSelections.keys
+                        .map(
+                          (e) => DropdownMenuItem(
+                            child: Text(e),
+                            value: sortSelections[e],
                           ),
-                        ))
+                        )
+                        .toList(),
+                    value: _sortOptionSelected,
+                    onChanged: (value) {
+                      setState(() {
+                        _sortOptionSelected = value;
+                      });
+                    },
+                  ),
+                )
               ],
             ),
             DefaultTabController(
