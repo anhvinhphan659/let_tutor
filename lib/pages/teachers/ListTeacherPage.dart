@@ -16,6 +16,7 @@ import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
 import 'package:let_tutor/utils/util_function.dart';
+import 'package:number_paginator/number_paginator.dart';
 
 import 'TeacherPagination.dart';
 
@@ -27,6 +28,7 @@ class ListTeacherPage extends StatefulWidget {
 }
 
 class _ListTeacherPageState extends State<ListTeacherPage> {
+  static const int PER_PAGE = 12;
   BookingSchedule? nextSchedule;
   var skills = [
     "All",
@@ -46,34 +48,54 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
   ];
   int _selectedSkill = 0;
   bool isLoading = true;
+  bool isTeacherLoading = true;
   var favoriteTecher = [];
   List<Teacher> teacherList = [];
+  int pageCount = 1;
+  int _currentPage = 1;
 
   int lessonTotalTime = 0;
 
   @override
   void initState() {
     super.initState();
-    TeacherController.getListTeacher().then(
-      (value) {
-        setState(() {
-          teacherList = value;
-          isLoading = false;
-        });
-      },
-    );
-    ScheduleController.getNextLesson().then((value) {
+
+    updateListTeacher();
+    initPage();
+  }
+
+  void updateListTeacher() {
+    TeacherController.searchTeacher(
+      page: _currentPage,
+      perPage: PER_PAGE,
+    ).then((value) {
+      int count = value['count'];
+      List<Teacher> teachers = value['teachers'] ?? <Teacher>[];
       setState(() {
-        nextSchedule = value;
-        if (value != null) {
-          print(nextSchedule);
-        }
+        pageCount = (count / PER_PAGE).ceil();
+        teacherList = teachers;
+        isTeacherLoading = false;
       });
+      // print("Count: " + value['count'].toString());
+      print("Teacher in respond: " +
+          (value['teachers'] as List<Teacher>).length.toString());
     });
-    ScheduleController.getLessonTotalTime().then((value) {
-      setState(() {
-        lessonTotalTime = value;
-      });
+  }
+
+  void sortListTeacher() {
+    teacherList.sort(((a, b) {
+      String aFavorite = a.isFavoriteTutor ?? "";
+      String bFavorite = b.isFavoriteTutor ?? "";
+
+      return bFavorite.compareTo(aFavorite);
+    }));
+  }
+
+  Future<void> initPage() async {
+    nextSchedule = await ScheduleController.getNextLesson();
+    lessonTotalTime = await ScheduleController.getLessonTotalTime();
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -87,6 +109,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
         hasLesson = false;
       }
     }
+    sortListTeacher();
     return Scaffold(
         appBar: const LettutorAppBar(),
         body: isLoading
@@ -414,33 +437,66 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 33),
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Recommended Tutors',
-                          style: LettutorFontStyles.searchTitle.copyWith(
-                            fontSize: 25,
+                  Stack(
+                    children: [
+                      isTeacherLoading
+                          ? const CircularProgressIndicator()
+                          : const SizedBox(),
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 250),
+                        opacity: isTeacherLoading ? 0.2 : 1.0,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 33),
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Recommended Tutors',
+                                style: LettutorFontStyles.searchTitle.copyWith(
+                                  fontSize: 25,
+                                ),
+                              ),
+                              // Text("List gia sư"),
+                              ...List.generate(
+                                  teacherList.length,
+                                  (index) => TeacherCard(
+                                        teacher: teacherList[index],
+                                        onFavoriteTap: () async {
+                                          var teacher = teacherList[index];
+                                          setState(() {
+                                            if (teacher.isFavoriteTutor !=
+                                                null) {
+                                              teacherList[index]
+                                                  .isFavoriteTutor = null;
+                                            } else {
+                                              teacherList[index]
+                                                  .isFavoriteTutor = "1";
+                                            }
+                                            sortListTeacher();
+                                          });
+
+                                          TeacherController.addFavoriteTeacher(
+                                              teacher.id ?? "");
+                                          // updateListTeacher();
+                                        },
+                                      )),
+                              NumberPaginator(
+                                numberPages: pageCount,
+                                initialPage: _currentPage - 1,
+                                onPageChange: (pageIndex) {
+                                  setState(() {
+                                    _currentPage = pageIndex + 1;
+                                    isTeacherLoading = true;
+                                  });
+                                  updateListTeacher();
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                        // Text("List gia sư"),
-                        ...List.generate(
-                            teacherList.length,
-                            (index) => TeacherCard(
-                                  teacher: teacherList[index],
-                                  onFavoriteTap: () {
-                                    setState(() {
-                                      favoriteTecher[index] =
-                                          !favoriteTecher[index];
-                                    });
-                                  },
-                                )),
-                        TeacherPagination(),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                 ],
               ));

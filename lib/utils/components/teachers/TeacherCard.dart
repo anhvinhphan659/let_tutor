@@ -160,7 +160,7 @@ class TeacherCard extends StatelessWidget {
                 onPressed: () {
                   onFavoriteTap!();
                 },
-                icon: isFavorite
+                icon: teacher.isFavoriteTutor != null
                     ? Icon(
                         Icons.favorite,
                         color: Colors.red,
