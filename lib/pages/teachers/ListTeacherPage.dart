@@ -54,6 +54,10 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
   int pageCount = 1;
   int _currentPage = 1;
 
+  TextEditingController _selectDayTextController = TextEditingController();
+  TextEditingController _selectStartTimeController = TextEditingController();
+  TextEditingController _selectEndTimeController = TextEditingController();
+
   int lessonTotalTime = 0;
 
   @override
@@ -64,10 +68,23 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
     initPage();
   }
 
+  //search teacher variable
+  DateTime? startPickedTime;
+  DateTime? endPickedTime;
+  List<String> specialties = const [];
+  DateTime? tutorDatePicked;
+  String? date;
+  Map<String, bool> nationality = const {};
+  List<int?> tutoringTimeAvailable = const [null, null];
+
   void updateListTeacher() {
     TeacherController.searchTeacher(
+      specialties: specialties,
+      date: date,
       page: _currentPage,
       perPage: PER_PAGE,
+      nationality: nationality,
+      tutoringTimeAvailable: tutoringTimeAvailable,
     ).then((value) {
       int count = value['count'];
       List<Teacher> teachers = value['teachers'] ?? <Teacher>[];
@@ -110,6 +127,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
       }
     }
     sortListTeacher();
+
     return Scaffold(
         appBar: const LettutorAppBar(),
         body: isLoading
@@ -345,51 +363,168 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                         Wrap(
                           children: [
                             Container(
-                              width: 125,
+                              width: 200,
                               child: TextField(
-                                  decoration: InputDecoration(
-                                hintText: "Select a day",
-                                hintStyle: LettutorFontStyles.hintText,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10.0),
-                                isDense: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromRGBO(217, 217, 217, 1.0),
-                                  ),
-                                ),
-                                disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromRGBO(64, 169, 255, 1.0),
-                                  ),
-                                ),
-                              )),
+                                controller: _selectDayTextController,
+                                decoration: InputDecoration(
+                                    hintText: "Select a day",
+                                    hintStyle: LettutorFontStyles.hintText,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5.0),
+                                    isDense: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                      borderSide: const BorderSide(
+                                        color:
+                                            Color.fromRGBO(217, 217, 217, 1.0),
+                                      ),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                      borderSide: const BorderSide(
+                                        color:
+                                            Color.fromRGBO(64, 169, 255, 1.0),
+                                      ),
+                                    ),
+                                    suffixIcon: tutorDatePicked != null
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                tutorDatePicked = null;
+                                                _selectDayTextController.text =
+                                                    "";
+                                              });
+                                            },
+                                            child: const Icon(Icons.cancel))
+                                        : GestureDetector(
+                                            onTap: () async {
+                                              tutorDatePicked =
+                                                  await showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime.now(),
+                                                lastDate: DateTime.now().add(
+                                                  const Duration(
+                                                      days: 365 * 20),
+                                                ),
+                                              );
+                                              setState(() {
+                                                if (tutorDatePicked != null) {
+                                                  _selectDayTextController
+                                                      .text = DateFormat(
+                                                          "y-M-d")
+                                                      .format(tutorDatePicked!);
+                                                } else {
+                                                  _selectDayTextController
+                                                      .text = "";
+                                                }
+                                              });
+                                            },
+                                            child: const Icon(
+                                              Icons.calendar_today,
+                                              size: 16,
+                                            ))),
+                              ),
                             ),
                             Container(
-                              width: 125,
-                              decoration: BoxDecoration(),
-                              child: TextField(
-                                  decoration: InputDecoration(
-                                hintText: "Start time ...",
-                                hintStyle: LettutorFontStyles.hintText,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10.0),
-                                isDense: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromRGBO(217, 217, 217, 1.0),
-                                  ),
+                              padding: const EdgeInsets.only(right: 10),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color.fromRGBO(217, 217, 217, 1.0),
                                 ),
-                                disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromRGBO(64, 169, 255, 1.0),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    width: 100,
+                                    height: 40,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        startPickedTime =
+                                            await showTimePickerSpinner(
+                                                context);
+
+                                        setState(() {
+                                          if (startPickedTime != null) {
+                                            _selectStartTimeController.text =
+                                                DateFormat("HH:mm")
+                                                    .format(startPickedTime!);
+                                          }
+                                        });
+                                      },
+                                      child: TextField(
+                                        enabled: false,
+                                        controller: _selectStartTimeController,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: "Start time",
+                                          hintStyle:
+                                              LettutorFontStyles.hintText,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 10,
+                                                  vertical: 5.0),
+                                          isDense: true,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              )),
+                                  const Icon(Icons.trending_flat),
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    width: 80,
+                                    height: 40,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        endPickedTime =
+                                            await showTimePickerSpinner(
+                                                context);
+                                        setState(() {
+                                          if (endPickedTime != null) {
+                                            _selectEndTimeController.text =
+                                                DateFormat("HH:mm")
+                                                    .format(endPickedTime!);
+                                          }
+                                        });
+                                      },
+                                      child: TextField(
+                                        controller: _selectEndTimeController,
+                                        enabled: false,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: "End time",
+                                          hintStyle:
+                                              LettutorFontStyles.hintText,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 10,
+                                                  vertical: 5.0),
+                                          isDense: true,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  (startPickedTime != null &&
+                                          endPickedTime != null)
+                                      ? GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              startPickedTime = null;
+                                              endPickedTime = null;
+                                              _selectStartTimeController
+                                                  .clear();
+                                              _selectEndTimeController.clear();
+                                            });
+                                          },
+                                          child: Icon(Icons.cancel),
+                                        )
+                                      : const Icon(Icons.access_alarm),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -477,7 +612,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                           });
 
                                           TeacherController.addFavoriteTeacher(
-                                              teacher.id ?? "");
+                                              teacher.userId ?? "");
                                           // updateListTeacher();
                                         },
                                       )),

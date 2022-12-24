@@ -12,16 +12,9 @@ import 'package:let_tutor/utils/util_function.dart';
 
 class TeacherCard extends StatelessWidget {
   final Teacher teacher;
-  bool isActive;
 
-  bool isFavorite;
-  Function? onFavoriteTap;
-  TeacherCard(
-      {required this.teacher,
-      this.isActive = false,
-      this.isFavorite = false,
-      this.onFavoriteTap,
-      Key? key})
+  final Function? onFavoriteTap;
+  const TeacherCard({required this.teacher, this.onFavoriteTap, Key? key})
       : super(key: key);
 
   @override

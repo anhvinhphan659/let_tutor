@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:let_tutor/utils/data/country.dart';
@@ -74,4 +76,38 @@ Future<void> displayURL(String _url) async {
   ))) {
     throw 'Could not launch $_url';
   }
+}
+
+Future<DateTime?> showTimePickerSpinner(BuildContext context) async {
+  DateTime? pickedTime;
+  await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: TimePickerSpinner(
+            is24HourMode: true,
+            isShowSeconds: false,
+            minutesInterval: 30,
+            onTimeChange: (value) {
+              pickedTime = value;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                pickedTime = null;
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Ok"))
+          ],
+        );
+      });
+
+  return pickedTime;
 }

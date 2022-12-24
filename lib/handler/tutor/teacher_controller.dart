@@ -40,19 +40,24 @@ class TeacherController {
   static Future<Map<String, dynamic>> searchTeacher({
     List<String> specialties = const [],
     int page = 1,
+    String? date,
+    Map<String, bool> nationality = const {},
+    List<int?> tutoringTimeAvailable = const [null, null],
     int perPage = 12,
+    String search = "",
   }) async {
     List<Teacher> teachers = [];
     String requestUrl = "$baseUrl$_path/search";
     Map payload = {
       "filters": {
         "specialties": specialties,
-        "date": null,
-        "nationality": {},
-        "tutoringTimeAvailable": [null, null]
+        "date": date,
+        "nationality": nationality,
+        "tutoringTimeAvailable": tutoringTimeAvailable,
       },
       "page": page,
       "perPage": perPage,
+      "search": search,
     };
     Response respond = await ApiHandler.handler.post(
       requestUrl,
