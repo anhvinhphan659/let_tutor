@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:let_tutor/handler/api_handler.dart';
 
 import 'package:let_tutor/models/user.dart';
@@ -60,5 +61,32 @@ class UserController {
       }
     }
     return res;
+  }
+
+  static Future<bool> updatePersonalInformation(
+    User user, {
+    List<String> learnTopics = const [],
+    List<String> testPreparations = const [],
+  }) async {
+    Map dataBody = {
+      "name": user.name,
+      "country": user.country,
+      "phone": user.phone,
+      "birthday": user.birthday,
+      "level": user.level,
+      "learnTopics": learnTopics,
+      "testPreparations": testPreparations,
+    };
+
+    print(dataBody);
+    //call api
+    String requestUrl = "$baseUrl$_userPath/info";
+    Response respond = await ApiHandler.handler.put(
+      requestUrl,
+      options: ApiHandler.getHeaders(),
+      data: dataBody,
+    );
+    return respond.statusCode == 200;
+    // return true;
   }
 }

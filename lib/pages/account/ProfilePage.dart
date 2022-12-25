@@ -77,6 +77,8 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       }
     }
+
+    print("User country: ${user.country ?? ""}");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -186,11 +188,36 @@ class _ProfilePageState extends State<ProfilePage> {
                         UserTitleHeader("Name"),
                         CustomTextField(_nameController,
                             initialText: user.name!),
-                        UserTitleHeader("Email Address"),
+                        UserTitleHeader("Email Address", isCompulsory: false),
                         CustomTextField(_emailController,
                             enabled: false, initialText: user.email!),
                         UserTitleHeader("Country"),
-                        TextField(),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6.0),
+                            border: Border.all(
+                              color: Color(0xFFD9D9D9),
+                            ),
+                          ),
+                          child: DropdownButton(
+                              underline: const SizedBox(),
+                              isExpanded: true,
+                              value: user.country ?? "",
+                              items: (UtilStorage.countries)
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.code ?? "",
+                                      child: Text(e.name ?? ""),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  user.country = value;
+                                });
+                              }),
+                        ),
                         UserTitleHeader("Phone number"),
                         CustomTextField(_phoneController,
                             initialText: user.phone!, enabled: false),
@@ -289,11 +316,23 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                             initialValue: initValue,
                             onConfirm: (result) {
-                              // print(result);
+                              print(result.length);
+                              List<String> topics = [];
+                              List<LearnTopics> uniqueResult = [];
+                              for (var topic in result) {
+                                if (topics.contains(topic.name) == false) {
+                                  topics.add(topic.name ?? "");
+                                  uniqueResult.add(topic);
+                                }
+                              }
+                              print(uniqueResult
+                                  .map((e) => e.id.toString() + " - " + e.name!)
+                                  .toList());
+                              // print(result.map((e) => e.id).toList());
                             },
                           ),
                         ),
-                        UserTitleHeader("Study Schedule"),
+                        UserTitleHeader("Study Schedule", isCompulsory: false),
                         TextFormField(
                             minLines: 4,
                             maxLines: 5,
@@ -318,28 +357,40 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             ElevatedButton(
                                 onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      //call update function
-                                      Future.delayed(
-                                          const Duration(milliseconds: 1000),
-                                          () async {
-                                        Navigator.pop(context);
-                                      });
-                                      return AlertDialog(
-                                          content: Row(
-                                        children: const [
-                                          Icon(
-                                            Icons.verified,
-                                          ),
-                                          Text("Successfull")
-                                        ],
-                                      ));
-                                    },
-                                  );
+                                  user.name = _nameController.text;
+                                  user.birthday = DateFormat("y-M-d")
+                                      .format(_birthdaySelected);
+                                  user.level = _levelSelected;
+
+                                  UserController.updatePersonalInformation(user)
+                                      .then((value) {
+                                    if (value) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          //call update function
+
+                                          Future.delayed(
+                                              const Duration(
+                                                  milliseconds: 1000),
+                                              () async {
+                                            Navigator.pop(context);
+                                          });
+                                          return AlertDialog(
+                                              content: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.verified,
+                                              ),
+                                              Text("Successfull")
+                                            ],
+                                          ));
+                                        },
+                                      );
+                                    }
+                                  });
                                 },
-                                child: Text('Save changes')),
+                                child: const Text('Save changes')),
                           ],
                         )
                       ],
