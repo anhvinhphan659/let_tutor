@@ -8,14 +8,17 @@ import 'package:intl/intl.dart';
 import 'package:let_tutor/handler/schedule/schedule_controller.dart';
 import 'package:let_tutor/handler/tutor/teacher_controller.dart';
 import 'package:let_tutor/models/schedule/booking_history.dart';
+import 'package:let_tutor/models/user.dart';
 import 'package:let_tutor/models/teacher/teacher.dart';
 import 'package:let_tutor/pages/conference/VideoConference.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
 import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
 import 'package:let_tutor/utils/util_function.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:number_paginator/number_paginator.dart';
 
 import 'TeacherPagination.dart';
@@ -28,23 +31,14 @@ class ListTeacherPage extends StatefulWidget {
 }
 
 class _ListTeacherPageState extends State<ListTeacherPage> {
+  // ignore: constant_identifier_names
   static const int PER_PAGE = 12;
   BookingSchedule? nextSchedule;
-  var skills = [
-    "All",
-    "For Studing Abroad",
-    "English for Kid",
-    "English for Traveling",
-    "Conversational English",
-    "Business English",
-    "STARTERS",
-    "MOVERS",
-    "FLYERS",
-    "KET",
-    "PET",
-    "IELTS",
-    "TOEFL",
-    "TOEIC",
+
+  var skills = <LearnTopics>[
+    LearnTopics(id: 0, key: "", name: "All"),
+    ...UtilStorage.learnTopics,
+    ...UtilStorage.testPreparations,
   ];
   int _selectedSkill = 0;
   bool isLoading = true;
@@ -54,9 +48,12 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
   int pageCount = 1;
   int _currentPage = 1;
 
-  TextEditingController _selectDayTextController = TextEditingController();
-  TextEditingController _selectStartTimeController = TextEditingController();
-  TextEditingController _selectEndTimeController = TextEditingController();
+  final TextEditingController _selectDayTextController =
+      TextEditingController();
+  final TextEditingController _selectStartTimeController =
+      TextEditingController();
+  final TextEditingController _selectEndTimeController =
+      TextEditingController();
 
   int lessonTotalTime = 0;
 
@@ -71,11 +68,48 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
   //search teacher variable
   DateTime? startPickedTime;
   DateTime? endPickedTime;
-  List<String> specialties = const [];
+  List<String> specialties = [];
   DateTime? tutorDatePicked;
   String? date;
-  Map<String, bool> nationality = const {};
+  Map<String, bool> nationality = {};
   List<int?> tutoringTimeAvailable = const [null, null];
+  String searchName = "";
+
+//check picked datetime for converting to data
+  bool checkTimeSelection() {
+    if (tutorDatePicked != null) {
+      //if tutor date is picked
+      date = tutorDatePicked.toString();
+      tutoringTimeAvailable = [
+        DateTime(tutorDatePicked!.year, tutorDatePicked!.month,
+                tutorDatePicked!.day, 0, 0)
+            .millisecondsSinceEpoch,
+        DateTime(tutorDatePicked!.year, tutorDatePicked!.month,
+                tutorDatePicked!.day, 23, 59)
+            .millisecondsSinceEpoch
+      ];
+      if (startPickedTime != null && endPickedTime != null) {
+        var startTime = DateTime(
+            tutorDatePicked!.year,
+            tutorDatePicked!.month,
+            tutorDatePicked!.day,
+            startPickedTime!.hour,
+            startPickedTime!.minute);
+        var endTime = DateTime(tutorDatePicked!.year, tutorDatePicked!.month,
+            tutorDatePicked!.day, endPickedTime!.hour, endPickedTime!.minute);
+        tutoringTimeAvailable = [
+          startTime.millisecondsSinceEpoch,
+          endTime.millisecondsSinceEpoch
+        ];
+      }
+
+      return true;
+    } else {
+      date = null;
+      tutoringTimeAvailable = [null, null];
+    }
+    return false;
+  }
 
   void updateListTeacher() {
     TeacherController.searchTeacher(
@@ -85,6 +119,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
       perPage: PER_PAGE,
       nationality: nationality,
       tutoringTimeAvailable: tutoringTimeAvailable,
+      search: searchName,
     ).then((value) {
       int count = value['count'];
       List<Teacher> teachers = value['teachers'] ?? <Teacher>[];
@@ -94,8 +129,8 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
         isTeacherLoading = false;
       });
       // print("Count: " + value['count'].toString());
-      print("Teacher in respond: " +
-          (value['teachers'] as List<Teacher>).length.toString());
+      // print("Teacher in respond: " +
+      //     (value['teachers'] as List<Teacher>).length.toString());
     });
   }
 
@@ -205,11 +240,26 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                             if (time == null) {
                                               return Text("");
                                             }
-                                            String timeString = (time!.hours ??
-                                                        0) <
-                                                    10
-                                                ? "0${time.hours}"
-                                                : "${time.hours}:${(time.min ?? 0) < 10 ? "0${time.min}" : "${time.min}"}:${(time.sec ?? 0) < 10 ? "0${time.sec}" : "${time.sec}"}";
+                                            int hh = time.hours ?? 0;
+                                            int mm = time.min ?? 0;
+                                            int ss = time.sec ?? 0;
+
+                                            String timeString = "";
+                                            if (hh < 10) {
+                                              timeString += "0$hh";
+                                            } else {
+                                              timeString += hh.toString();
+                                            }
+                                            if (mm < 10) {
+                                              timeString += ":0$mm";
+                                            } else {
+                                              timeString += ":$mm";
+                                            }
+                                            if (ss < 10) {
+                                              timeString += ":0$ss";
+                                            } else {
+                                              timeString += ":$ss";
+                                            }
                                             return Text(
                                               "(start in $timeString)",
                                               style: LettutorFontStyles
@@ -290,8 +340,15 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                           children: [
                             Container(
                               width: 200,
-                              margin: EdgeInsets.only(right: 5.0),
+                              margin:
+                                  const EdgeInsets.only(right: 5.0, bottom: 10),
                               child: TextField(
+                                onSubmitted: (value) {
+                                  setState(() {
+                                    searchName = value;
+                                    updateListTeacher();
+                                  });
+                                },
                                 decoration: InputDecoration(
                                   hintText: "Enter tutor name...",
                                   hintStyle: LettutorFontStyles.hintText,
@@ -319,37 +376,49 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                               ),
                             ),
                             Container(
-                                width: 250,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 4.0, vertical: 1.0),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    border: Border.all(
-                                      color: Color.fromRGBO(217, 217, 217, 1.0),
-                                    )),
-                                child: GFMultiSelect(
-                                    size: 15,
-                                    dropdownTitleTilePadding: EdgeInsets.zero,
-                                    dropdownTitleTileText:
-                                        "Select tutor nationality",
-                                    dropdownUnderlineBorder:
-                                        BorderSide(width: 0),
-                                    dropdownTitleTileMargin:
-                                        EdgeInsets.symmetric(horizontal: 4.0),
-                                    hideDropdownUnderline: true,
-                                    dropdownTitleTileHintTextStyle:
-                                        LettutorFontStyles.hintText,
-                                    dropdownTitleTileTextStyle:
-                                        LettutorFontStyles.hintText,
-                                    items: const [
-                                      "Foreign Tutor",
-                                      "Vietnamese Tutor",
-                                      "Native English Tutor",
-                                    ],
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0, vertical: 4.0),
-                                    margin: EdgeInsets.zero,
-                                    onSelect: ((value) => print(value)))),
+                              width: 250,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4.0, vertical: 1.0),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(50),
+                                  border: Border.all(
+                                    color: Color.fromRGBO(217, 217, 217, 1.0),
+                                  )),
+                              child: MultiSelectDialogField(
+                                buttonText: Text("Select tutor nationality"),
+                                title: Text("Select tutor nationality"),
+                                items: [
+                                  MultiSelectItem("foreign", "Foreign Tutor"),
+                                  MultiSelectItem(
+                                      "isVietNamese", "Vietnamese Tutor"),
+                                  MultiSelectItem(
+                                      "isNative", "Native English Tutor"),
+                                ],
+                                onConfirm: (value) {
+                                  Map<String, bool> nationMap = {};
+                                  if (value.contains("foreign")) {
+                                    if (value.length == 3) {
+                                      nationMap = {};
+                                    } else {
+                                      if (value.contains("isNative")) {
+                                        nationMap = {"isVietNamese": false};
+                                      } else {
+                                        nationMap = {"isNative": false};
+                                      }
+                                    }
+                                  } else {
+                                    for (var val in value) {
+                                      nationMap[val] = true;
+                                    }
+                                  }
+
+                                  setState(() {
+                                    nationality = nationMap;
+                                  });
+                                  updateListTeacher();
+                                },
+                              ),
+                            ),
                           ],
                         ),
                         Padding(
@@ -363,8 +432,16 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                         Wrap(
                           children: [
                             Container(
+                              margin: const EdgeInsets.only(bottom: 10),
                               width: 200,
                               child: TextField(
+                                onTap: () async {
+                                  await setDatePicked();
+                                  if (checkTimeSelection()) {
+                                    print(startPickedTime);
+                                    updateListTeacher();
+                                  }
+                                },
                                 controller: _selectDayTextController,
                                 decoration: InputDecoration(
                                     hintText: "Select a day",
@@ -393,32 +470,15 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                                 tutorDatePicked = null;
                                                 _selectDayTextController.text =
                                                     "";
+                                                //update date DATA
+                                                checkTimeSelection();
+                                                updateListTeacher();
                                               });
                                             },
                                             child: const Icon(Icons.cancel))
                                         : GestureDetector(
                                             onTap: () async {
-                                              tutorDatePicked =
-                                                  await showDatePicker(
-                                                context: context,
-                                                initialDate: DateTime.now(),
-                                                firstDate: DateTime.now(),
-                                                lastDate: DateTime.now().add(
-                                                  const Duration(
-                                                      days: 365 * 20),
-                                                ),
-                                              );
-                                              setState(() {
-                                                if (tutorDatePicked != null) {
-                                                  _selectDayTextController
-                                                      .text = DateFormat(
-                                                          "y-M-d")
-                                                      .format(tutorDatePicked!);
-                                                } else {
-                                                  _selectDayTextController
-                                                      .text = "";
-                                                }
-                                              });
+                                              await setDatePicked();
                                             },
                                             child: const Icon(
                                               Icons.calendar_today,
@@ -428,6 +488,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                             ),
                             Container(
                               padding: const EdgeInsets.only(right: 10),
+                              margin: const EdgeInsets.only(bottom: 10),
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   color: Color.fromRGBO(217, 217, 217, 1.0),
@@ -447,7 +508,10 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                         startPickedTime =
                                             await showTimePickerSpinner(
                                                 context);
-
+                                        if (checkTimeSelection()) {
+                                          print(tutorDatePicked);
+                                          updateListTeacher();
+                                        }
                                         setState(() {
                                           if (startPickedTime != null) {
                                             _selectStartTimeController.text =
@@ -483,6 +547,10 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                         endPickedTime =
                                             await showTimePickerSpinner(
                                                 context);
+                                        if (checkTimeSelection()) {
+                                          print(tutorDatePicked);
+                                          updateListTeacher();
+                                        }
                                         setState(() {
                                           if (endPickedTime != null) {
                                             _selectEndTimeController.text =
@@ -518,11 +586,17 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                               _selectStartTimeController
                                                   .clear();
                                               _selectEndTimeController.clear();
+                                              //update date data
+                                              checkTimeSelection();
+                                              updateListTeacher();
                                             });
                                           },
                                           child: Icon(Icons.cancel),
                                         )
-                                      : const Icon(Icons.access_alarm),
+                                      : const Icon(
+                                          Icons.access_alarm,
+                                          size: 15,
+                                        ),
                                 ],
                               ),
                             ),
@@ -534,13 +608,20 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                               skills.length,
                               (index) => GestureDetector(
                                 child: SkillTag(
-                                  skill: skills[index],
+                                  skill: skills[index].name ?? "",
                                   selected: index == _selectedSkill,
                                 ),
                                 onTap: () {
+                                  specialties = [];
+                                  String selectedSkill =
+                                      skills[index].name ?? "";
                                   setState(() {
                                     _selectedSkill = index;
                                   });
+                                  if (selectedSkill.isNotEmpty) {
+                                    specialties.add(skills[index].key ?? "");
+                                    updateListTeacher();
+                                  }
                                 },
                               ),
                             )
@@ -548,6 +629,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                         ),
                         GestureDetector(
                           onTap: () {
+                            specialties.clear();
                             setState(() {
                               _selectedSkill = 0;
                             });
@@ -616,17 +698,32 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                           // updateListTeacher();
                                         },
                                       )),
-                              NumberPaginator(
-                                numberPages: pageCount,
-                                initialPage: _currentPage - 1,
-                                onPageChange: (pageIndex) {
-                                  setState(() {
-                                    _currentPage = pageIndex + 1;
-                                    isTeacherLoading = true;
-                                  });
-                                  updateListTeacher();
-                                },
-                              ),
+                              pageCount > 0
+                                  ? NumberPaginator(
+                                      numberPages: pageCount,
+                                      initialPage: _currentPage - 1,
+                                      onPageChange: (pageIndex) {
+                                        setState(() {
+                                          _currentPage = pageIndex + 1;
+                                          isTeacherLoading = true;
+                                        });
+                                        updateListTeacher();
+                                      },
+                                    )
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: const [
+                                        SizedBox(
+                                          height: 100,
+                                        ),
+                                        Text(
+                                            "Sorry we can't find any tutor with this keywords"),
+                                        SizedBox(
+                                          height: 100,
+                                        ),
+                                      ],
+                                    ),
                             ],
                           ),
                         ),
@@ -635,5 +732,24 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                   )
                 ],
               ));
+  }
+
+  Future<void> setDatePicked() async {
+    tutorDatePicked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365 * 20),
+      ),
+    );
+    setState(() {
+      if (tutorDatePicked != null) {
+        _selectDayTextController.text =
+            DateFormat("y-M-d").format(tutorDatePicked!);
+      } else {
+        _selectDayTextController.text = "";
+      }
+    });
   }
 }

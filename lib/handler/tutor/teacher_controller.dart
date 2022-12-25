@@ -59,6 +59,8 @@ class TeacherController {
       "perPage": perPage,
       "search": search,
     };
+
+    print("Payload: " + payload.toString());
     Response respond = await ApiHandler.handler.post(
       requestUrl,
       options: ApiHandler.getHeaders(),
