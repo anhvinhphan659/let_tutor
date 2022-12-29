@@ -53,4 +53,18 @@ class AuthController {
   static String getAccessToken() {
     return _accessToken;
   }
+
+  static Future<bool> changePassword(
+      String oldPassword, String newPassword) async {
+    String requestUrl = "${baseUrl}auth/change-password";
+    Response respond = await ApiHandler.handler.post(
+      requestUrl,
+      options: ApiHandler.getHeaders(),
+      data: {
+        "password": oldPassword,
+        "newPassword": newPassword,
+      },
+    );
+    return respond.statusCode == 200;
+  }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/handler/auth/auth_controller.dart';
 import 'package:let_tutor/pages/account/ProfilePage.dart';
 import 'package:let_tutor/pages/account/SettingPage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 import '../../utils/components/common.dart';
 
@@ -19,6 +21,60 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _newPasswordController = TextEditingController();
 
   final _renewPasswordController = TextEditingController();
+
+  String _newPassword = "";
+
+  bool _isPasswordHandling = false;
+
+  Widget PasswordTextField(TextEditingController controller,
+      {String initialText = "",
+      bool enabled = true,
+      Function(String?)? setPassword,
+      String? oldPassword}) {
+    return TextFormField(
+      enabled: enabled,
+      controller: controller,
+      obscureText: true,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      onChanged: (value) {
+        if (setPassword != null) {
+          print("Password set: " + value);
+          setPassword(value);
+        }
+      },
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Please input your password";
+          }
+          if (value.length < 6) {
+            return "Password length must be at least 6 characters";
+          }
+          if (oldPassword != null) {
+            if (oldPassword.compareTo(value) != 0) {
+              return "The two passwords that you entered do not match";
+            }
+          }
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6.0),
+          borderSide: const BorderSide(
+            color: Color(0xFFD9D9D9),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6.0),
+          borderSide: const BorderSide(
+            color: Color(0xFF40A9FF),
+          ),
+        ),
+        errorMaxLines: 3,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,16 +149,69 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       ),
                       children: [
                         UserTitleHeader("Password"),
-                        CustomTextField(_oldPasswordController),
-                        UserTitleHeader("New Password"),
-                        CustomTextField(_newPasswordController),
-                        UserTitleHeader("Confirm Password"),
-                        CustomTextField(_renewPasswordController),
+                        PasswordTextField(
+                          _oldPasswordController,
+                          enabled: !_isPasswordHandling,
+                        ),
+                        UserTitleHeader(
+                          "New Password",
+                        ),
+                        PasswordTextField(
+                          _newPasswordController,
+                          enabled: !_isPasswordHandling,
+                          setPassword: (value) {
+                            print("Get value: " + value!);
+                            setState(() {
+                              _newPassword = value ?? "";
+                            });
+                          },
+                        ),
+                        UserTitleHeader(
+                          "Confirm Password",
+                        ),
+                        PasswordTextField(_renewPasswordController,
+                            enabled: !_isPasswordHandling,
+                            oldPassword: _newPassword),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  String oldPassword =
+                                      _oldPasswordController.text;
+                                  String reNewPassword =
+                                      _renewPasswordController.text;
+                                  if (oldPassword.length >= 6 &&
+                                      reNewPassword.length >= 6 &&
+                                      _newPassword.length >= 6) {
+                                    if (reNewPassword.compareTo(_newPassword) ==
+                                        0) {
+                                      setState(() {
+                                        _isPasswordHandling = true;
+                                      });
+                                      bool result =
+                                          await AuthController.changePassword(
+                                              oldPassword, _newPassword);
+
+                                      if (result) {
+                                        _oldPasswordController.clear();
+                                        _newPasswordController.clear();
+                                        _renewPasswordController.clear();
+                                        // ignore: use_build_context_synchronously
+                                        await displayMessage(context,
+                                            message:
+                                                "Change password successfully");
+                                      }
+
+                                      print("Result: " + result.toString());
+                                    }
+                                  }
+                                  setState(() {
+                                    _isPasswordHandling = false;
+                                  });
+
+                                  print("Error in input");
+                                },
                                 child: Text("Change Password"))
                           ],
                         )

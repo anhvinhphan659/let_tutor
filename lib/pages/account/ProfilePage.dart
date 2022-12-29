@@ -9,6 +9,7 @@ import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
 import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
@@ -365,28 +366,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   UserController.updatePersonalInformation(user)
                                       .then((value) {
                                     if (value) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          //call update function
-
-                                          Future.delayed(
-                                              const Duration(
-                                                  milliseconds: 1000),
-                                              () async {
-                                            Navigator.pop(context);
-                                          });
-                                          return AlertDialog(
-                                              content: Row(
-                                            children: const [
-                                              Icon(
-                                                Icons.verified,
-                                              ),
-                                              Text("Successfull")
-                                            ],
-                                          ));
-                                        },
-                                      );
+                                      displayMessage(context,
+                                          message: "Successfull");
                                     }
                                   });
                                 },

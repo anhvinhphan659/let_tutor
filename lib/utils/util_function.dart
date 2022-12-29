@@ -78,6 +78,35 @@ Future<void> displayURL(String _url) async {
   }
 }
 
+Future displayMessage(BuildContext context,
+    {String message = "Successfull"}) async {
+  await showDialog(
+    context: context,
+    builder: (context) {
+      //call update function
+
+      Future.delayed(const Duration(milliseconds: 1000), () async {
+        Navigator.pop(context);
+      });
+      return SizedBox(
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: AlertDialog(
+            content: Row(
+          children: [
+            Icon(
+              Icons.verified,
+            ),
+            Text(
+              message,
+              maxLines: 3,
+            )
+          ],
+        )),
+      );
+    },
+  );
+}
+
 Future<DateTime?> showTimePickerSpinner(BuildContext context) async {
   DateTime? pickedTime;
   await showDialog(
