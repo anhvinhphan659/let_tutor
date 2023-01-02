@@ -184,4 +184,23 @@ class ScheduleController {
     }
     return 0;
   }
+
+  static Future<void> cancelBookedClass(String scheduleDetailId,
+      {int cancelReasonID = 1}) async {
+    String requestUrl = "$baseUrl$_bookingPath/schedule-detail";
+    Response respond = await ApiHandler.handler.delete(
+      requestUrl,
+      data: {
+        "scheduleDetailId": scheduleDetailId,
+        "cancelInfo": {
+          "cancelReasonId": cancelReasonID,
+        }
+      },
+      options: ApiHandler.getHeaders(),
+    );
+    if (respond.statusCode == 200) {
+      print("Success");
+    }
+    print("Failed");
+  }
 }

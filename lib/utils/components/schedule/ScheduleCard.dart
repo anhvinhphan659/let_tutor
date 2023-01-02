@@ -1,10 +1,14 @@
 // import 'package:expandable_text/expandable_text.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 // import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:let_tutor/handler/schedule/schedule_controller.dart';
 import 'package:let_tutor/models/schedule/booking_history.dart';
 import 'package:let_tutor/models/schedule/schedule.dart';
+import 'package:let_tutor/pages/account/ProfilePage.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
@@ -25,10 +29,11 @@ class _ScheduleCardState extends State<ScheduleCard> {
     var schedule = widget.schedule;
     var teacher = widget.schedule.scheduleDetailInfo!.scheduleInfo!.tutorInfo;
     var scheduleDetail = widget.schedule.scheduleDetailInfo!;
+    print(json.encode(schedule.toJson()));
     DateTime startTime = DateTime.fromMillisecondsSinceEpoch(
         scheduleDetail.startPeriodTimestamp ?? 0);
     bool canCancel =
-        DateTime.now().add(Duration(hours: 1)).compareTo(startTime) < 0;
+        DateTime.now().add(Duration(hours: 2)).compareTo(startTime) < 0;
     return Container(
       margin: const EdgeInsets.only(top: 24),
       padding: const EdgeInsets.all(12.0),
@@ -142,7 +147,13 @@ class _ScheduleCardState extends State<ScheduleCard> {
                     ),
                     canCancel
                         ? GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              if (canCancel) {
+                                print(scheduleDetail.id);
+                                ScheduleController.cancelBookedClass(
+                                    schedule.id ?? "");
+                              }
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4, horizontal: 10),
@@ -221,6 +232,49 @@ class _ScheduleCardState extends State<ScheduleCard> {
             ],
           )
         ],
+      ),
+    );
+  }
+
+  void showCancelDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Container(
+          child: Column(
+            children: [
+              UserTitleHeader("What was the reason you cancel this booking?"),
+              DropdownButton(items: [
+                DropdownMenuItem(
+                  child: Text("Reschedule at another time"),
+                  value: 1,
+                ),
+                DropdownMenuItem(
+                  child: Text("Busy at that time"),
+                  value: 2,
+                ),
+                DropdownMenuItem(
+                  child: Text("Asked by the tutor"),
+                  value: 3,
+                ),
+                DropdownMenuItem(
+                  child: Text("Other"),
+                  value: 4,
+                ),
+              ], onChanged: (value) {})
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Later"),
+          ),
+          ElevatedButton(onPressed: () {}, child: Text("Submit"))
+        ],
+        actionsAlignment: MainAxisAlignment.end,
       ),
     );
   }
