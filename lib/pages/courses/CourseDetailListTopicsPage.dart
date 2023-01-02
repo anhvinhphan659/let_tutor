@@ -4,6 +4,7 @@ import 'package:let_tutor/pages/courses/CourseDetailPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 import 'package:let_tutor/utils/util_function.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class CourseListTopicPage extends StatefulWidget {
   final Course course;
@@ -27,7 +28,16 @@ class _CourseListTopicPageState extends State<CourseListTopicPage> {
   Widget build(BuildContext context) {
     Course course = widget.course;
     //TODO: display file
-    displayURL(course.topics![selectedIndex].nameFile ?? "");
+    // print(course.topics![selectedIndex].nameFile);
+    // displayURL(course.topics![selectedIndex].nameFile ?? "");
+    String? fileUrl;
+    fileUrl = course.topics![selectedIndex].nameFile;
+    var topics = course.topics ?? [];
+    topics.sort(
+      (a, b) {
+        return (a.orderCourse ?? 0) - (b.orderCourse ?? 0);
+      },
+    );
     return Scaffold(
       appBar: const LettutorAppBar(),
       body: Container(
@@ -59,7 +69,7 @@ class _CourseListTopicPageState extends State<CourseListTopicPage> {
                         ),
                         Header('List Topic', displayDivider: false),
                         ...List.generate(
-                          course.topics!.length,
+                          topics!.length,
                           (index) => GestureDetector(
                             onTap: () {
                               setState(() {
@@ -97,7 +107,7 @@ class _CourseListTopicPageState extends State<CourseListTopicPage> {
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10),
                                         child: Text(
-                                          course.topics![index].name ?? "",
+                                          topics![index].name ?? "",
                                           style: LettutorFontStyles.h5Title
                                               .copyWith(fontSize: 14),
                                           maxLines: 4,
@@ -110,6 +120,44 @@ class _CourseListTopicPageState extends State<CourseListTopicPage> {
                             ),
                           ),
                         ),
+                        fileUrl != null
+                            ? Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey.shade500)),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.center,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey.shade100,
+                                          border: Border.all(
+                                            color: Colors.grey.shade500,
+                                          )),
+                                      child: Text(
+                                        getNameFromFileUrl(fileUrl),
+                                        style: LettutorFontStyles.reviewText,
+                                      ),
+                                    ),
+                                    Container(
+                                        alignment: Alignment.center,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.8,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.8 *
+                                                1.412,
+                                        child: SfPdfViewer.network(
+                                          fileUrl,
+                                        )),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
                       ],
                     ),
                   ),
@@ -121,4 +169,12 @@ class _CourseListTopicPageState extends State<CourseListTopicPage> {
       ),
     );
   }
+}
+
+String getNameFromFileUrl(String url) {
+  var elements = url.split("/");
+  String ret = elements[elements.length - 1];
+  elements = ret.split("file");
+  ret = elements[elements.length - 1];
+  return ret;
 }
