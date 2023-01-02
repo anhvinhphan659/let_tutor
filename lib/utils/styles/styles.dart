@@ -61,7 +61,7 @@ class LettutorFontStyles {
       height: 1.2);
   static TextStyle largeLabelText = TextStyle(
       fontSize: 30,
-      fontWeight: FontWeight.normal,
+      fontWeight: FontWeight.w600,
       fontFamily: 'Poppins, sans-serif',
       color: Colors.black.withOpacity(0.85),
       height: 1.45);

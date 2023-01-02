@@ -89,4 +89,20 @@ class UserController {
     return respond.statusCode == 200;
     // return true;
   }
+
+  static Future<bool> forgotPassword(String email) async {
+    String requestUrl = "${baseUrl}user/forgotPassword";
+    Response respond = await ApiHandler.handler.post(
+      requestUrl,
+      data: {"email": email},
+    );
+    if (respond.statusCode == 200) {
+      var data = respond.data;
+      String message = data['message'];
+      if (message.contains("success")) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

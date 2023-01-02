@@ -57,6 +57,11 @@ dependencies:
   jwt_decode: ^0.3.1
   url_launcher: ^6.1.7
   flutter_time_picker_spinner: ^2.0.0
+  firebase_core:
+  firebase_auth:
+  google_sign_in: ^5.4.2
+  flutter_facebook_auth: ^5.0.7
+  # flutter_pdfview: ^1.2.5
 
 dev_dependencies:
   flutter_test:

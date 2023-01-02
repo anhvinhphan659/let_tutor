@@ -90,7 +90,7 @@ class User {
     canSendMessage = json['canSendMessage'];
     studentGroup = json['studentGroup'];
     studentInfo = json['studentInfo'];
-    avgRating = json['avgRating'];
+    avgRating = double.tryParse(json['avgRating'].toString()) ?? 0.0;
   }
 
   Map<String, dynamic> toJson() {

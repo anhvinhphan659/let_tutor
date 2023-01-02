@@ -79,29 +79,32 @@ Future<void> displayURL(String _url) async {
 }
 
 Future displayMessage(BuildContext context,
-    {String message = "Successfull"}) async {
+    {Widget icon = const Icon(
+      Icons.check_circle,
+      color: Colors.green,
+    ),
+    String message = "Successfull"}) async {
   await showDialog(
     context: context,
     builder: (context) {
       //call update function
-
       Future.delayed(const Duration(milliseconds: 1000), () async {
         Navigator.pop(context);
       });
-      return SizedBox(
-        width: MediaQuery.of(context).size.width * 0.6,
-        child: AlertDialog(
-            content: Row(
-          children: [
-            Icon(
-              Icons.verified,
-            ),
-            Text(
-              message,
-              maxLines: 3,
-            )
-          ],
-        )),
+      return AlertDialog(
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.6,
+          height: 80,
+          child: Row(
+            children: [
+              icon,
+              Text(
+                message,
+                maxLines: 3,
+              )
+            ],
+          ),
+        ),
       );
     },
   );
@@ -139,4 +142,14 @@ Future<DateTime?> showTimePickerSpinner(BuildContext context) async {
       });
 
   return pickedTime;
+}
+
+String? isValidEmail(String? value) {
+  if (value == null ||
+      value.isEmpty ||
+      !value.contains('@') ||
+      !value.contains('.')) {
+    return 'The input is not valid E-mail!';
+  }
+  return null;
 }

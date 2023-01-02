@@ -1,0 +1,8 @@
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\Windows 10\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 0F:15:0C:9B:56:76:6F:37:CF:D0:E5:D3:4A:CC:21:36
+SHA1: 37:17:0C:50:DD:87:D9:86:F3:1F:E7:FE:FF:82:65:6A:FC:0D:D4:84
+SHA-256: 83:B3:AD:61:44:2C:B7:3D:B3:4C:87:B5:17:C9:AE:FF:49:FC:94:8E:37:3B:E3:CB:D3:A9:6B:B0:EB:0C:11:68
+Valid until: Saturday, September 28, 2052

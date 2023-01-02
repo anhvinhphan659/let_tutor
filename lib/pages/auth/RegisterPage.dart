@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/handler/auth/auth_controller.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -11,6 +13,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  bool isRequestSending = false;
   final TextEditingController _usernameTxtController = TextEditingController();
   final TextEditingController _passwordTxtController = TextEditingController();
   @override
@@ -60,7 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   Container(
                     padding: const EdgeInsets.all(0.0),
-                    child: TextField(
+                    child: TextFormField(
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -71,6 +74,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         hintText: "mail@example.com",
                       ),
                       controller: _usernameTxtController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: isValidEmail,
                     ),
                   ),
                   Padding(
@@ -80,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   Container(
                     padding: const EdgeInsets.only(bottom: 16.0),
-                    child: TextField(
+                    child: TextFormField(
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -90,25 +95,71 @@ class _RegisterPageState extends State<RegisterPage> {
                         contentPadding: EdgeInsets.all(10.0),
                       ),
                       controller: _passwordTxtController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please input your Password!';
+                        }
+                        return null;
+                      },
                       obscureText: true,
                       autocorrect: false,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: LettutorColors.primaryColor,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(6.0))),
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Center(
-                        child: Text(
-                          "SIGN UP",
-                          style: LettutorFontStyles.formDescription.copyWith(
-                            fontSize: 20,
-                            color: Colors.white,
+                  AnimatedOpacity(
+                    duration: const Duration(seconds: 0),
+                    opacity: isRequestSending ? 0.3 : 1.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                          color: LettutorColors.primaryColor,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(6.0))),
+                      child: TextButton(
+                        onPressed: () async {
+                          String email = _usernameTxtController.text;
+                          String password = _passwordTxtController.text;
+                          if (password.isEmpty || isValidEmail(email) != null) {
+                            return;
+                          }
+                          setState(() {
+                            isRequestSending = true;
+                          });
+                          try {
+                            bool result = await AuthController.registerAccount(
+                                email, password);
+                            setState(() {
+                              isRequestSending = false;
+                            });
+                            print("Sign up: " + result.toString());
+                            if (result) {
+                              _usernameTxtController.clear();
+                              _passwordTxtController.clear();
+                              PushTo(
+                                  context: context,
+                                  destination: const LoginPage());
+                            }
+                          } catch (e) {
+                            //
+                          }
+                        },
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              isRequestSending
+                                  ? const CircularProgressIndicator()
+                                  : const SizedBox(),
+                              Text(
+                                "SIGN UP",
+                                style:
+                                    LettutorFontStyles.formDescription.copyWith(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),

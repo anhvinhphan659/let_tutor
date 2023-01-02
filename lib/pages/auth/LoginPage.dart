@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:let_tutor/handler/auth/auth_controller.dart';
 import 'package:let_tutor/handler/user/user_controller.dart';
 import 'package:let_tutor/utils/components/common.dart';
@@ -10,6 +13,8 @@ import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
 import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 
+import '../../utils/util_function.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -18,16 +23,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool isSeen = false;
   final TextEditingController _usernameTxtController = TextEditingController();
   final TextEditingController _passwordTxtController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: LettutorAppBar(isLogin: false),
+        appBar: const LettutorAppBar(isLogin: false),
         body: LayoutBuilder(
           builder: (context, constraints) {
             bool isSmallDevice = constraints.maxWidth >= 600;
-
             var image = Image.asset(
               'assets/images/background_lettutor.png',
               fit: BoxFit.fitWidth,
@@ -67,8 +72,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Container(
                     padding: const EdgeInsets.all(0.0),
-                    child: TextField(
+                    child: TextFormField(
                       decoration: const InputDecoration(
+                        errorMaxLines: 3,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.0),
@@ -78,6 +84,8 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: "mail@example.com",
                       ),
                       controller: _usernameTxtController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: isValidEmail,
                     ),
                   ),
                   Padding(
@@ -87,9 +95,19 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Container(
                     padding: const EdgeInsets.only(bottom: 16.0),
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isSeen = !isSeen;
+                              });
+                            },
+                            child: Icon(isSeen
+                                ? Icons.visibility
+                                : Icons.visibility_off)),
+                        errorMaxLines: 3,
+                        border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.0),
                           ),
@@ -97,8 +115,15 @@ class _LoginPageState extends State<LoginPage> {
                         contentPadding: EdgeInsets.all(10.0),
                       ),
                       controller: _passwordTxtController,
-                      obscureText: true,
+                      obscureText: !isSeen,
                       autocorrect: false,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please input your Password!';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   Padding(
@@ -123,9 +148,14 @@ class _LoginPageState extends State<LoginPage> {
                             const BorderRadius.all(Radius.circular(6.0))),
                     child: TextButton(
                       onPressed: () async {
-                        var loginStatus = await AuthController.login(
-                            _usernameTxtController.text,
-                            _passwordTxtController.text);
+                        String email = _usernameTxtController.text;
+                        String password = _passwordTxtController.text;
+
+                        if (password.isEmpty || isValidEmail(email) != null) {
+                          return;
+                        }
+                        var loginStatus =
+                            await AuthController.login(email, password);
 
                         if (loginStatus == LOGIN_STATUS.SUCCESSFUL) {
                           PushTo(
@@ -159,11 +189,36 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                            onPressed: () {}, icon: Icon(Icons.facebook)),
-                        IconButton(onPressed: () {}, icon: Icon(Icons.zoom_in)),
+                            onPressed: () {
+                              facebookSignInHandle();
+                            },
+                            icon: SvgPicture.asset(
+                              "assets/icons/facebook-logo.svg",
+                              fit: BoxFit.fitHeight,
+                              height: 60,
+                            )),
+                        IconButton(
+                            onPressed: () async {
+                              var res = await googleSignInHandle();
+                              if (res) {
+                                print("Go to list teacher page");
+                                PushTo(
+                                    context: context,
+                                    destination: ListTeacherPage());
+                              }
+                            },
+                            icon: SvgPicture.asset(
+                              "assets/icons/google-logo.svg",
+                              fit: BoxFit.fitHeight,
+                              height: 60,
+                            )),
                         IconButton(
                             onPressed: () {},
-                            icon: Icon(Icons.phone_android_outlined)),
+                            icon: SvgPicture.asset(
+                              "assets/icons/mobile-logo.svg",
+                              fit: BoxFit.fitHeight,
+                              height: 60,
+                            )),
                       ],
                     ),
                   ),
@@ -221,5 +276,40 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
         ));
+  }
+}
+
+Future<bool> googleSignInHandle() async {
+  var account = await GoogleSignIn().signIn();
+
+  if (account != null) {
+    print(account.email);
+    var authenticate = await account.authentication;
+    print("Google auth");
+    print(authenticate.idToken);
+
+    if (authenticate.accessToken != null) {
+      print(authenticate.accessToken);
+      var loginStatus =
+          await AuthController.googleSignIn(authenticate.accessToken!);
+      print(loginStatus);
+      if (loginStatus == LOGIN_STATUS.SUCCESSFUL) {
+        print("Login google success");
+        return true;
+      }
+    } else {
+      await GoogleSignIn().signOut();
+    }
+  }
+
+  return false;
+}
+
+Future<void> facebookSignInHandle() async {
+  var result =
+      await FacebookAuth.i.login(permissions: ["public_profile", "email"]);
+  if (result.status == LoginStatus.success) {
+    print("Facebook Auth: ");
+    print(result.accessToken);
   }
 }

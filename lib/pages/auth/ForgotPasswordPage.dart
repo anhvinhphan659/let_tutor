@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/pages/auth/ResetPasswordSuccessfullPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({Key? key}) : super(key: key);
@@ -10,6 +13,7 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  bool isRequestSending = false;
   final TextEditingController _emailTxtController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -19,6 +23,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           color: Colors.white,
           alignment: Alignment.center,
           child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             constraints: const BoxConstraints(maxWidth: 400),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -33,7 +38,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 Center(
                   child: Text(
-                    'Vui lòng nhập email để tìm kiếm tài khoản của bạn.',
+                    'Please enter your email address to search for your account.',
                     style: LettutorFontStyles.normalText,
                   ),
                 ),
@@ -46,8 +51,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 TextField(
                   controller: _emailTxtController,
-                  decoration: InputDecoration(
-                      border: const OutlineInputBorder(
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(
                           borderRadius:
                               BorderRadius.all(Radius.circular(6.0)))),
                 ),
@@ -59,13 +64,56 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       color: LettutorColors.primaryColor,
                       borderRadius:
                           const BorderRadius.all(Radius.circular(6.0))),
-                  child: TextButton(
-                    child: Text(
-                      'Confirm',
-                      style: LettutorFontStyles.normalText
-                          .copyWith(color: Colors.white),
+                  child: AnimatedOpacity(
+                    duration: Duration(milliseconds: 600),
+                    opacity: isRequestSending ? 0.4 : 1.0,
+                    child: TextButton(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          isRequestSending
+                              ? const CircularProgressIndicator()
+                              : const SizedBox(),
+                          Text(
+                            'Send reset link',
+                            style: LettutorFontStyles.normalText
+                                .copyWith(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      onPressed: () async {
+                        String email = _emailTxtController.text;
+                        //prevent multiple tap
+                        if (isRequestSending) {
+                          return;
+                        }
+                        if (email.isNotEmpty) {
+                          setState(() {
+                            isRequestSending = true;
+                          });
+                          bool result = false;
+                          try {
+                            result = await UserController.forgotPassword(email);
+                          } catch (e) {
+                            print(e);
+                          }
+
+                          setState(() {
+                            isRequestSending = false;
+
+                            print("set to default");
+                          });
+                          if (result) {
+                            _emailTxtController.clear();
+                            PushTo(
+                              context: context,
+                              destination: const ResetPasswordSuccessfullPage(),
+                            );
+                          }
+                        }
+                      },
                     ),
-                    onPressed: () {},
                   ),
                 )
               ],
