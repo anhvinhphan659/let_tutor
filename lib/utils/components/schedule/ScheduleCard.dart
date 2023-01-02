@@ -16,7 +16,9 @@ import 'package:let_tutor/utils/util_function.dart';
 
 class ScheduleCard extends StatefulWidget {
   final BookingSchedule schedule;
-  const ScheduleCard({required this.schedule, Key? key}) : super(key: key);
+  final Function? onCancelCallBack;
+  const ScheduleCard({required this.schedule, this.onCancelCallBack, Key? key})
+      : super(key: key);
 
   @override
   State<ScheduleCard> createState() => _ScheduleCardState();
@@ -29,7 +31,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
     var schedule = widget.schedule;
     var teacher = widget.schedule.scheduleDetailInfo!.scheduleInfo!.tutorInfo;
     var scheduleDetail = widget.schedule.scheduleDetailInfo!;
-    print(json.encode(schedule.toJson()));
+
     DateTime startTime = DateTime.fromMillisecondsSinceEpoch(
         scheduleDetail.startPeriodTimestamp ?? 0);
     bool canCancel =
@@ -149,9 +151,106 @@ class _ScheduleCardState extends State<ScheduleCard> {
                         ? GestureDetector(
                             onTap: () {
                               if (canCancel) {
-                                print(scheduleDetail.id);
-                                ScheduleController.cancelBookedClass(
-                                    schedule.id ?? "");
+                                int? selectedValue = 1;
+
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    content: StatefulBuilder(
+                                        builder: (context, update) {
+                                      return Container(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            StateAvatar(
+                                              foregroundRadius: 5,
+                                              backgroundRadius: 30,
+                                              dx: 46,
+                                              displayTop:
+                                                  teacher.isActivated ?? false,
+                                              child: Image.network(
+                                                teacher!.avatar ?? "",
+                                              ),
+                                            ),
+                                            Text(
+                                              "Lesson Time",
+                                              style:
+                                                  LettutorFontStyles.hintText,
+                                            ),
+                                            Text(
+                                              DateFormat(
+                                                "EEE, dd MMM yy",
+                                              ).format(startTime),
+                                              style: LettutorFontStyles
+                                                  .meeting_date,
+                                            ),
+                                            Divider(),
+                                            UserTitleHeader(
+                                                "What was the reason you cancel this booking?"),
+                                            DropdownButton(
+                                                value: selectedValue,
+                                                items: const [
+                                                  DropdownMenuItem(
+                                                    child: Text(
+                                                        "Reschedule at another time"),
+                                                    value: 1,
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: Text(
+                                                        "Busy at that time"),
+                                                    value: 2,
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: Text(
+                                                        "Asked by the tutor"),
+                                                    value: 3,
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: Text("Other"),
+                                                    value: 4,
+                                                  ),
+                                                ],
+                                                onChanged: (value) {
+                                                  update(() {
+                                                    selectedValue = value;
+                                                  });
+                                                }),
+                                            TextFormField(
+                                              decoration: const InputDecoration(
+                                                  border: OutlineInputBorder(),
+                                                  hintText: "Additonal Notes"),
+                                              maxLines: 3,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Later"),
+                                      ),
+                                      ElevatedButton(
+                                          onPressed: () async {
+                                            Navigator.pop(context);
+                                            await ScheduleController
+                                                .cancelBookedClass(
+                                                    schedule.id ?? "",
+                                                    cancelReasonID:
+                                                        selectedValue ?? 1);
+
+                                            if (widget.onCancelCallBack !=
+                                                null) {
+                                              widget.onCancelCallBack!();
+                                            }
+                                          },
+                                          child: Text("Submit"))
+                                    ],
+                                    actionsAlignment: MainAxisAlignment.end,
+                                  ),
+                                );
                               }
                             },
                             child: Container(
@@ -232,49 +331,6 @@ class _ScheduleCardState extends State<ScheduleCard> {
             ],
           )
         ],
-      ),
-    );
-  }
-
-  void showCancelDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Container(
-          child: Column(
-            children: [
-              UserTitleHeader("What was the reason you cancel this booking?"),
-              DropdownButton(items: [
-                DropdownMenuItem(
-                  child: Text("Reschedule at another time"),
-                  value: 1,
-                ),
-                DropdownMenuItem(
-                  child: Text("Busy at that time"),
-                  value: 2,
-                ),
-                DropdownMenuItem(
-                  child: Text("Asked by the tutor"),
-                  value: 3,
-                ),
-                DropdownMenuItem(
-                  child: Text("Other"),
-                  value: 4,
-                ),
-              ], onChanged: (value) {})
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text("Later"),
-          ),
-          ElevatedButton(onPressed: () {}, child: Text("Submit"))
-        ],
-        actionsAlignment: MainAxisAlignment.end,
       ),
     );
   }

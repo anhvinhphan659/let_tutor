@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
@@ -47,6 +49,22 @@ class _ProfilePageState extends State<ProfilePage> {
     "PROFICIENCY": "C2 (Proficiency)",
   };
 
+  List<int> wtlIndex = [];
+
+  var topics = [
+    ...UtilStorage.learnTopics,
+    ...UtilStorage.testPreparations,
+  ];
+
+  int getIndexInTopics(LearnTopics topic) {
+    for (int i = 0; i < topics.length; i++) {
+      if (topic.name!.contains(topics[i].name!)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -58,12 +76,21 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     // print(user.toJson());
-    print("build");
 
-    List<LearnTopics> initValue = [];
-    initValue.addAll(user.learnTopics ?? []);
-    initValue.addAll((user.testPreparations ?? []));
-    print(initValue);
+    var userTopics = [
+      ...user.learnTopics ?? [],
+      ...user.testPreparations ?? [],
+    ];
+    wtlIndex.clear();
+    for (var t in userTopics) {
+      int index = getIndexInTopics(t);
+      if (index >= 0) {
+        wtlIndex.add(index);
+      }
+    }
+    print("WTL LENGTH: ${wtlIndex.length}");
+
+    print(json.encode(user.toJson()));
     //set up display
     _studyController.text = user.studySchedule ?? "";
     _levelSelected = user.level ?? "";
@@ -74,12 +101,11 @@ class _ProfilePageState extends State<ProfilePage> {
       if (!user.avatar!.contains("avatar-default")) {
         avatarWidget = Image.network(
           user.avatar!,
-          fit: BoxFit.fill,
+          fit: BoxFit.fitHeight,
         );
       }
     }
 
-    print("User country: ${user.country ?? ""}");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -92,28 +118,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         leadingWidth: 300,
         actions: [
-          PopupMenuButton<int>(
-              offset: Offset(0, 60),
-              icon: Icon(
-                Icons.flag_circle,
-                color: Colors.black,
-              ),
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem<int>(
-                    child: Text('Option 1'),
-                    value: 1,
-                  ),
-                  PopupMenuItem<int>(
-                    child: Text('Option 2'),
-                    value: 2,
-                  ),
-                  PopupMenuItem<int>(
-                    child: Text('Option 3'),
-                    value: 3,
-                  ),
-                ];
-              }),
           IconButton(
             onPressed: () {
               PushTo(context: context, destination: SettingPage());
@@ -253,7 +257,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(DateFormat('y/M/d')
+                              Text(DateFormat('y-MM-dd')
                                   .format(_birthdaySelected)),
                               GestureDetector(
                                   onTap: () async {
@@ -307,29 +311,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         Container(
                           decoration: BoxDecoration(),
                           child: MultiSelectDialogField(
-                            items: [
-                              ...UtilStorage.learnTopics.map(
-                                (e) => MultiSelectItem(e, e.name ?? ""),
-                              ),
-                              ...UtilStorage.testPreparations.map(
-                                (e) => MultiSelectItem(e, e.name ?? ""),
-                              ),
-                            ],
-                            initialValue: initValue,
+                            items: List.generate(
+                                topics.length,
+                                (index) => MultiSelectItem(
+                                    index, topics[index].name ?? "")),
+                            initialValue: wtlIndex,
                             onConfirm: (result) {
-                              print(result.length);
-                              List<String> topics = [];
-                              List<LearnTopics> uniqueResult = [];
-                              for (var topic in result) {
-                                if (topics.contains(topic.name) == false) {
-                                  topics.add(topic.name ?? "");
-                                  uniqueResult.add(topic);
-                                }
-                              }
-                              print(uniqueResult
-                                  .map((e) => e.id.toString() + " - " + e.name!)
-                                  .toList());
-                              // print(result.map((e) => e.id).toList());
+                              print(result);
+                              wtlIndex = result;
                             },
                           ),
                         ),
@@ -358,13 +347,31 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             ElevatedButton(
                                 onPressed: () {
+                                  int learnTopicsLength =
+                                      UtilStorage.learnTopics.length;
+                                  List<String> learnTopicsIndex = [];
+                                  List<String> testPreparationsIndex = [];
+                                  for (int index in wtlIndex) {
+                                    if (index < learnTopicsLength) {
+                                      if (topics[index].id != null) {
+                                        learnTopicsIndex
+                                            .add(topics[index].id.toString());
+                                      }
+                                    } else {
+                                      testPreparationsIndex
+                                          .add(topics[index].id.toString());
+                                    }
+                                  }
                                   user.name = _nameController.text;
-                                  user.birthday = DateFormat("y-M-d")
+                                  user.birthday = DateFormat("y-MM-dd")
                                       .format(_birthdaySelected);
                                   user.level = _levelSelected;
 
-                                  UserController.updatePersonalInformation(user)
-                                      .then((value) {
+                                  UserController.updatePersonalInformation(
+                                    user,
+                                    testPreparations: testPreparationsIndex,
+                                    learnTopics: learnTopicsIndex,
+                                  ).then((value) {
                                     if (value) {
                                       displayMessage(context,
                                           message: "Successfull");
