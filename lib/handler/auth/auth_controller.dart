@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:let_tutor/handler/api_handler.dart';
 import 'package:let_tutor/handler/auth/auth_token.dart';
+import 'package:let_tutor/handler/data_handler.dart';
 import 'package:let_tutor/handler/user/user_controller.dart';
 
 // ignore: camel_case_types
@@ -30,13 +31,47 @@ class AuthController {
       var body = respond.data;
       AuthToken accessToken = AuthToken.fromJson(body['tokens']['access']);
       AuthToken refreshToken = AuthToken.fromJson(body['tokens']['refresh']);
+      //store access token
+      handleTokenData(body);
       return respond.data['tokens']['access']['token'];
     }
     return "ERROR";
   }
 
+  static Future<void> refreshAccessToken() async {
+    final refreshToken = DataHandler.getData("refreshToken");
+    if (refreshToken != null) {
+      final response = await ApiHandler.handler.post(
+          "${baseUrl}auth/refresh-token",
+          data: {"refreshToken": refreshToken, "timezone": 7});
+
+      if (response.statusCode == 200) {
+        var body = response.data;
+        handleTokenData(body);
+      }
+    }
+  }
+
+  static void handleTokenData(dynamic body) {
+    AuthToken accessToken = AuthToken.fromJson(body['tokens']['access']);
+    AuthToken refreshToken = AuthToken.fromJson(body['tokens']['refresh']);
+    DataHandler.setData("accessToken", accessToken.token!);
+    DataHandler.setData("refreshToken", refreshToken.token!);
+    ApiHandler.handler.interceptors.add(
+      InterceptorsWrapper(
+        onError: (error, handler) async {
+          if (error.response!.statusCode == 401) {
+            await refreshAccessToken();
+          }
+        },
+      ),
+    );
+    handleTokenReceive(accessToken.token!);
+  }
+
   static Future<void> handleTokenReceive(String accessToken) async {
     _accessToken = accessToken;
+
     ApiHandler.setHeaders(
       Options(
         headers: {
@@ -64,9 +99,8 @@ class AuthController {
         .post(requestURL, data: {"access_token": accessToken});
     if (respond.statusCode == 200) {
       var body = respond.data;
-      AuthToken accessToken = AuthToken.fromJson(body['tokens']['access']);
-      AuthToken refreshToken = AuthToken.fromJson(body['tokens']['refresh']);
-      await handleTokenReceive(accessToken.token!);
+      handleTokenData(body);
+
       return LOGIN_STATUS.SUCCESSFUL;
     }
 

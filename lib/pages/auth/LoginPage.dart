@@ -1,9 +1,11 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:let_tutor/handler/auth/auth_controller.dart';
+import 'package:let_tutor/handler/data_handler.dart';
 import 'package:let_tutor/handler/user/user_controller.dart';
 import 'package:let_tutor/utils/components/common.dart';
 
@@ -158,6 +160,15 @@ class _LoginPageState extends State<LoginPage> {
                             await AuthController.login(email, password);
 
                         if (loginStatus == LOGIN_STATUS.SUCCESSFUL) {
+                          //handle login success
+                          DataHandler.setData("Email", email);
+                          DataHandler.setData("Password", password);
+                          FirebaseAnalytics.instance
+                              .logEvent(name: "login", parameters: {
+                            "email": email,
+                          }).then((value) {
+                            print("Log event Sign in");
+                          });
                           PushTo(
                               context: context,
                               destination: const ListTeacherPage());
@@ -202,6 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                               var res = await googleSignInHandle();
                               if (res) {
                                 print("Go to list teacher page");
+
                                 PushTo(
                                     context: context,
                                     destination: ListTeacherPage());
@@ -295,6 +307,13 @@ Future<bool> googleSignInHandle() async {
       print(loginStatus);
       if (loginStatus == LOGIN_STATUS.SUCCESSFUL) {
         print("Login google success");
+        DataHandler.setData("googleLoginEmail", account.email);
+        FirebaseAnalytics.instance.logEvent(name: "login", parameters: {
+          "email": account.email,
+        }).then((value) {
+          print("Log event Sign in");
+        });
+
         return true;
       }
     } else {

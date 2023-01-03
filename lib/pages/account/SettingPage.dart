@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:let_tutor/handler/data_handler.dart';
 import 'package:let_tutor/handler/user/user_controller.dart';
 import 'package:let_tutor/models/user.dart';
 import 'package:let_tutor/pages/account/ChangePasswordPage.dart';
@@ -90,6 +92,7 @@ class SettingPage extends StatelessWidget {
         "icon": 'assets/icons/sign-out-alt.svg',
         "screen": "Logout",
         "function": () {
+          _logOutHandler();
           PushTo(context: context, destination: LoginPage());
         },
       },
@@ -167,5 +170,18 @@ class SettingPage extends StatelessWidget {
         )
       ]),
     );
+  }
+
+  Future<void> _logOutHandler() async {
+    String? googleLoginEmail = await DataHandler.getData("googleLoginEmail");
+    if (googleLoginEmail != null) {
+      print("Sign out google email login");
+      print("Email: " + googleLoginEmail);
+      GoogleSignIn().signOut();
+    }
+    await DataHandler.removeKey("Email");
+    await DataHandler.removeKey("Password");
+    await DataHandler.removeKey("accessToken");
+    await DataHandler.removeKey("refreshToken");
   }
 }

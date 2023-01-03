@@ -18,6 +18,7 @@
     </intent>
     </queries>
    <application
+        android:usesCleartextTraffic="true"
         tools:replace="android:label"  
         android:label="LetTutor"
         android:name="${applicationName}"

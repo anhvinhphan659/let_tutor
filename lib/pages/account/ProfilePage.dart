@@ -70,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _phoneController = TextEditingController();
   final _studyController = TextEditingController();
   User user = UserController.currentUser;
-  String _levelSelected = "BEGINNER";
+  String? _levelSelected = "BEGINNER";
   DateTime _birthdaySelected = DateTime.now();
   var expandTab = false;
   @override
@@ -90,11 +90,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     print("WTL LENGTH: ${wtlIndex.length}");
 
+    print(user.country);
     print(json.encode(user.toJson()));
     //set up display
     _studyController.text = user.studySchedule ?? "";
-    _levelSelected = user.level ?? "";
-    _birthdaySelected = DateTime.parse(user.birthday ?? "");
+    _levelSelected = user.level;
+    _birthdaySelected =
+        DateTime.tryParse(user.birthday ?? "") ?? DateTime.now();
 
     Widget avatarWidget = DefaultAvatar(teacherName: user.name ?? "");
     if (user.avatar != null) {
@@ -208,7 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: DropdownButton(
                               underline: const SizedBox(),
                               isExpanded: true,
-                              value: user.country ?? "",
+                              value: user.country,
                               items: (UtilStorage.countries)
                                   .map(
                                     (e) => DropdownMenuItem(
