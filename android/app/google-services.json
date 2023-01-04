@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:934544275281:android:f25727a94974540aee4570",
+        "mobilesdk_app_id": "1:934544275281:android:7e5629a959333661ee4570",
         "android_client_info": {
-          "package_name": "com.example.let_tutor"
+          "package_name": "com.student.lettutor"
         }
       },
       "oauth_client": [
         {
-          "client_id": "934544275281-l1aa6ud9f5flpolcijqpot7n8smr7q4n.apps.googleusercontent.com",
+          "client_id": "934544275281-mvled6g2l4c0jle8fh5cu52m7sk384pv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.let_tutor",
+            "package_name": "com.student.lettutor",
             "certificate_hash": "37170c50dd87d986f31fe7feff82656afc0dd484"
           }
         },

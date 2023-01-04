@@ -1,8 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.let_tutor"
+    package="com.student.lettutor"
      xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     
     <!-- Provide required visibility configuration for API level 30 and above -->
     <queries>
@@ -17,16 +18,27 @@
         <data android:scheme="tel" />
     </intent>
     </queries>
+
    <application
         android:usesCleartextTraffic="true"
+
         tools:replace="android:label"  
         android:label="LetTutor"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
-        
+       <service
+           android:name="org.jitsi.meet.sdk.ConnectionService"
+           android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+           android:exported="true">
+           <intent-filter>
+               <action android:name="android.telecom.ConnectionService" />
+           </intent-filter>
+       </service>
     <activity android:name="com.facebook.FacebookActivity"
+
+        android:exported="true"
         android:configChanges=
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
         android:label="@string/app_name" />
@@ -70,3 +82,4 @@
             android:value="2" />
     </application>
 </manifest>
+
