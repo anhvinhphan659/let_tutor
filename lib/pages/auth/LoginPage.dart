@@ -163,6 +163,7 @@ class _LoginPageState extends State<LoginPage> {
                           //handle login success
                           DataHandler.setData("Email", email);
                           DataHandler.setData("Password", password);
+                          UserController.getUserInformation();
                           FirebaseAnalytics.instance
                               .logEvent(name: "login", parameters: {
                             "email": email,
@@ -212,6 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () async {
                               var res = await googleSignInHandle();
                               if (res) {
+                                UserController.getUserInformation();
                                 print("Go to list teacher page");
 
                                 PushTo(

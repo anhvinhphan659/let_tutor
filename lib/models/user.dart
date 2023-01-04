@@ -181,7 +181,7 @@ class TutorInfo {
     languages = json['languages'];
     specialties = json['specialties'];
     resume = json['resume'];
-    rating = json['rating'];
+    rating = double.tryParse(json['rating'].toString()) ?? 0.0;
     isActivated = json['isActivated'];
     isNative = json['isNative'];
   }

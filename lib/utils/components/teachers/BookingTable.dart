@@ -95,6 +95,7 @@ class BookingTable extends StatelessWidget {
           DateTime.fromMillisecondsSinceEpoch(schedule.endTimestamp ?? 0);
       DateFormat df = DateFormat("HH:mm");
       String period = "${df.format(startPeriod)}-${df.format(endPeriod)}";
+      bool canBool = DateTime.now().compareTo(startPeriod) < 0;
 
       if (tableDataMap[period] != null) {
         bool isBooked =
@@ -165,6 +166,7 @@ class BookingTable extends StatelessWidget {
                           if (callBack != null) {
                             callBack!();
                           }
+
                           Navigator.pop(context);
                           showDialog(
                               context: context,
@@ -209,6 +211,7 @@ class BookingTable extends StatelessWidget {
           },
           child: BookingCell(
             isBooked: isBooked,
+            canBook: canBool,
           ),
         ));
       }
@@ -290,22 +293,29 @@ class BookingTable extends StatelessWidget {
 
 class BookingCell extends StatelessWidget {
   final bool isBooked;
-  const BookingCell({Key? key, this.isBooked = false}) : super(key: key);
+  bool canBook;
+  BookingCell({Key? key, this.isBooked = false, this.canBook = true})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        child: Container(
+    // ignore: prefer_conditional_assignment
+    // if (canBook == null) {
+    //   canBook = isBooked;
+    // }
+    return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
-          color: isBooked ? Colors.white : Colors.blue,
+          color: isBooked!
+              ? Colors.white
+              : (canBook ? Colors.blue : Colors.grey.shade200),
           borderRadius: BorderRadius.circular(16.0)),
       child: Text(
         isBooked ? 'Booked' : 'Book',
         style: TextStyle(
             color: isBooked ? Colors.green : Colors.white, fontSize: 12),
       ),
-    ));
+    );
   }
 }

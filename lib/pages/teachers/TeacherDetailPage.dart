@@ -82,6 +82,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
             startTime: initialDate)
         .then((value) {
       if (value.isNotEmpty) {
+        bookingSchedule.clear();
         setState(() {
           bookingSchedule = value;
         });
@@ -218,6 +219,8 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                     children: [
                       InkWell(
                         onTap: () {
+                          TeacherController.addFavoriteTeacher(
+                              teacher.userId ?? "");
                           setState(() {
                             isFavorite = !isFavorite;
                           });
@@ -244,11 +247,151 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                         ),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          List<bool> options = [false, false, false];
+                          List<String> textOptions = [
+                            "This tutor is annoying me",
+                            "This profile is pretending be someone or is fake",
+                            "Inappropriate profile photo",
+                          ];
+                          bool canSubmit = false;
+                          TextEditingController reportTextController =
+                              TextEditingController();
+                          showModalBottomSheet(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              backgroundColor: Colors.white,
+                              context: context,
+                              builder: (_) =>
+                                  StatefulBuilder(builder: (context, update) {
+                                    return Container(
+                                      height: 400,
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 24.0),
+                                              child: Text(
+                                                "Report ${teacher.name ?? ""}",
+                                                style: LettutorFontStyles
+                                                    .h3Title
+                                                    .copyWith(fontSize: 18),
+                                              ),
+                                            ),
+                                            Divider(),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 24,
+                                                      vertical: 13),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Wrap(
+                                                    children: const [
+                                                      Icon(
+                                                        Icons.report,
+                                                        color: Colors.blue,
+                                                      ),
+                                                      Text(
+                                                          "Help us understand what's happening"),
+                                                    ],
+                                                  ),
+                                                  ...List.generate(
+                                                    options.length,
+                                                    (index) => Row(
+                                                      children: [
+                                                        Checkbox(
+                                                            value:
+                                                                options[index],
+                                                            onChanged: (value) {
+                                                              update(() {
+                                                                options[index] =
+                                                                    value!;
+                                                                for (var item
+                                                                    in options) {
+                                                                  if (item) {
+                                                                    canSubmit =
+                                                                        item;
+                                                                    break;
+                                                                  }
+                                                                }
+
+                                                                if (value) {
+                                                                  reportTextController
+                                                                          .text +=
+                                                                      '${textOptions[index]}\n';
+                                                                }
+                                                              });
+                                                            }),
+                                                        SizedBox(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                .7,
+                                                            child: Text(
+                                                                textOptions[
+                                                                    index]))
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  TextFormField(
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                    controller:
+                                                        reportTextController,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Divider(),
+                                                  Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text("Cancel"),
+                                                      ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          TeacherController
+                                                              .reportTeacher(
+                                                                  teacher.userId ??
+                                                                      "",
+                                                                  content:
+                                                                      reportTextController
+                                                                          .text);
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text("Submit"),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ]),
+                                    );
+                                  }));
+                        },
                         child: Column(
                           children: [
                             Icon(
-                              Icons.report_rounded,
+                              Icons.report_outlined,
                               color: LettutorColors.blueColor,
                             ),
                             Text(
@@ -431,6 +574,9 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                       child: BookingTable(
                         initialDate: initialDate,
                         teacherSchedule: bookingSchedule,
+                        callBack: () {
+                          getListScheduleInWeek();
+                        },
                       ),
                     ),
                   )

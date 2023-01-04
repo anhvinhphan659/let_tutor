@@ -92,4 +92,15 @@ class TeacherController {
       print(respond.data);
     }
   }
+
+  static Future<void> reportTeacher(String teacherID,
+      {String content = ""}) async {
+    String requestUrl = "$baseUrl$_path/report";
+    Response respond = await ApiHandler.handler
+        .post(requestUrl, options: ApiHandler.getHeaders(), data: {
+      "tutorId": teacherID,
+      "content": content,
+    });
+    print(respond.statusCode);
+  }
 }
