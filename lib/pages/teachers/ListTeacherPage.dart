@@ -705,6 +705,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                                                 teacherList[index]
                                                     .isFavoriteTutor = "1";
                                               }
+
                                               sortListTeacher();
                                             });
 

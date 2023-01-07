@@ -203,4 +203,16 @@ class ScheduleController {
     }
     print("Failed");
   }
+
+  static Future<bool> updateStudentRequest(String bookingID,
+      {String request = ""}) async {
+    String requestUrl = "$baseUrl$_bookingPath/student-request/$bookingID";
+    Response respond = await ApiHandler.handler.post(
+      requestUrl,
+      data: {"studentRequest": request},
+      options: ApiHandler.getHeaders(),
+    );
+    if (respond.statusCode == 200) return true;
+    return false;
+  }
 }

@@ -56,7 +56,7 @@ class _TeacherFeedbackDialogState extends State<TeacherFeedbackDialog> {
   @override
   Widget build(BuildContext context) {
     print(_currentPage);
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width * 0.85,
       height: MediaQuery.of(context).size.height * 0.6,
       child: Column(

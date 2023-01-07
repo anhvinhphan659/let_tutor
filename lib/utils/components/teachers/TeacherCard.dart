@@ -35,7 +35,7 @@ class TeacherCard extends StatelessWidget {
       countryName = country.name ?? "";
     }
 
-    bool hasReview = (teacher.feedbacks ?? []).length > 0;
+    bool hasReview = teacher.rating != null;
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),

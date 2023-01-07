@@ -290,7 +290,83 @@ class _ScheduleCardState extends State<ScheduleCard> {
                   initiallyExpanded: true,
                   trailing: TextButton(
                     child: Text("Edit Request"),
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (_) {
+                            final noteController = TextEditingController();
+                            noteController.text = schedule.studentRequest ?? "";
+                            return AlertDialog(
+                              content: SingleChildScrollView(
+                                child: SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * .7,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("Special Request"),
+                                          CloseButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                      Divider(),
+                                      UserTitleHeader("Note"),
+                                      TextFormField(
+                                        maxLines: 8,
+                                        maxLength: 200,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        controller: noteController,
+                                      ),
+                                      Text(
+                                        "You can write in English or Vietnamese (Maximum 200 letters)",
+                                        style: LettutorFontStyles.reviewText
+                                            .copyWith(
+                                                fontStyle: FontStyle.normal),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("Cancel"),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    print(noteController.text);
+                                    ScheduleController.updateStudentRequest(
+                                            schedule.id ?? "",
+                                            request: noteController.text)
+                                        .then((value) {
+                                      print("Result: $value");
+                                      if (widget.onCancelCallBack != null) {
+                                        widget.onCancelCallBack!();
+                                      }
+                                    });
+
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("Submit"),
+                                )
+                              ],
+                            );
+                          });
+                    },
                   ),
                   onExpansionChanged: (value) {
                     setState(() {

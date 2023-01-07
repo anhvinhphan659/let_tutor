@@ -93,14 +93,19 @@ Future displayMessage(BuildContext context,
       });
       return AlertDialog(
         content: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.6,
-          height: 80,
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: 100,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               icon,
-              Text(
-                message,
-                maxLines: 3,
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.55,
+                child: Text(
+                  message,
+                  maxLines: 3,
+                ),
               )
             ],
           ),

@@ -20,36 +20,46 @@ class CourseController {
   static Future<List<Course>> getListCourse({
     int page = 1,
     int perPage = 100,
-    List<int> level = const [],
-    String order = "level",
-    String orderBy = "DESC",
-    List<String> categoryId = const [],
-    String q = "",
+    List<int>? level,
+    String? order,
+    String? orderBy,
+    List<String>? categoryId,
+    String? q,
   }) async {
     String requestUrl = "$baseUrl$_coursePath";
     List<Course> courses = [];
+
+    Map<String, dynamic> queryParams = {
+      "page": page,
+      "size": perPage,
+      // "level[]": level,
+      // "order[]": "level",
+      // "orderBy[]": orderBy,
+      // "categoryId[]": categoryId,
+      // "q": q,
+    };
+    if (level != null) {
+      queryParams["level[]"] = level;
+    }
+    // if (order != null) {
+    //   queryParams["order[]"] = order;
+    // }
+    if (orderBy != null) {
+      queryParams["orderBy[]"] = orderBy;
+    }
+    if (categoryId != null) {
+      queryParams["categoryId[]"] = categoryId;
+    }
+    if (q != null) {
+      queryParams["q"] = q;
+    }
+
     Response respond = await ApiHandler.handler.get(
       requestUrl,
       options: ApiHandler.getHeaders(),
-      queryParameters: {
-        "page": page,
-        "size": perPage,
-        "level[]": level,
-        "order[]": "level",
-        "orderBy[]": orderBy,
-        "categoryId[]": categoryId,
-        "q": q,
-      },
+      queryParameters: queryParams,
     );
-    print({
-      "page": page,
-      "size": perPage,
-      "level[]": level,
-      "order[]": "level",
-      "orderBy[]": orderBy,
-      "categoryId[]": categoryId,
-      "q": q,
-    });
+    print(queryParams);
 
     if (respond.statusCode == 200) {
       print(respond.data);
@@ -93,36 +103,44 @@ class CourseController {
   static Future<Map<String, dynamic>> getListEBook(
       {int page = 1,
       int perPage = 100,
-      List<int> level = const [],
-      String order = "level",
-      String orderBy = "ASC",
-      List<String> categoryId = const [],
-      String q = ""}) async {
+      List<int>? level,
+      String? order,
+      String? orderBy,
+      List<String>? categoryId,
+      String? q}) async {
     String requestUrl = "$baseUrl$_ebookPath";
     List<EBook> ebooks = [];
     int count = 0;
+    Map<String, dynamic> queryParams = {
+      "page": page,
+      "size": perPage,
+      // "level[]": level,
+      "order[]": "level",
+      // "orderBy[]": orderBy,
+      // "categoryId[]": categoryId,
+      // "q": q,
+    };
     Response respond = await ApiHandler.handler.get(
       requestUrl,
       options: ApiHandler.getHeaders(),
-      queryParameters: {
-        "page": page,
-        "size": perPage,
-        "level[]": level,
-        "order[]": "level",
-        "orderBy[]": orderBy,
-        "categoryId[]": categoryId,
-        "q": q,
-      },
+      queryParameters: queryParams,
     );
-    print({
-      "page": page,
-      "size": perPage,
-      "level[]": level,
-      "order[]": "level",
-      "orderBy[]": orderBy,
-      "categoryId[]": categoryId,
-      "q": q,
-    });
+    if (level != null) {
+      queryParams["level[]"] = level;
+    }
+    // if (order != null) {
+    //   queryParams["order[]"] = order;
+    // }
+    if (orderBy != null) {
+      queryParams["orderBy[]"] = orderBy;
+    }
+    if (categoryId != null) {
+      queryParams["categoryId[]"] = categoryId;
+    }
+    if (q != null) {
+      queryParams["q"] = q;
+    }
+    print(queryParams);
     if (respond.statusCode == 200) {
       print(respond.data);
       count = respond.data['data']['count'];

@@ -105,7 +105,8 @@ class BookingTable extends StatelessWidget {
         if (isBooked || isReversed) {
           canBook = false;
         }
-        tableDataMap[period]![(startPeriod.day - initialDate!.day + 1) % 7] =
+
+        tableDataMap[period]![(startPeriod.day - initialDate!.day) % 7 + 1] =
             DataCell(
                 child: GestureDetector(
           onTap: () {

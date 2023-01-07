@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:let_tutor/handler/auth/auth_controller.dart';
+import 'package:let_tutor/handler/course/course_controller.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 import 'package:let_tutor/utils/util_function.dart';
 
@@ -180,11 +185,50 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                            onPressed: () {}, icon: Icon(Icons.facebook)),
-                        IconButton(onPressed: () {}, icon: Icon(Icons.zoom_in)),
+                            onPressed: () {
+                              facebookSignInHandle();
+                            },
+                            icon: SvgPicture.asset(
+                              "assets/icons/facebook-logo.svg",
+                              fit: BoxFit.fitHeight,
+                              height: 60,
+                            )),
+                        IconButton(
+                            onPressed: () async {
+                              var res = await googleSignInHandle();
+                              if (res) {
+                                UserController.getUserInformation();
+                                CourseController.getAllContentCategory()
+                                    .then((value) {
+                                  UtilStorage.contentCategories = value;
+                                });
+
+                                print("Go to list teacher page");
+
+                                PushTo(
+                                    context: context,
+                                    destination: ListTeacherPage());
+                              }
+                            },
+                            icon: SvgPicture.asset(
+                              "assets/icons/google-logo.svg",
+                              fit: BoxFit.fitHeight,
+                              height: 55,
+                            )),
                         IconButton(
                             onPressed: () {},
-                            icon: Icon(Icons.phone_android_outlined)),
+                            icon: Container(
+                              padding: const EdgeInsets.all(5.0),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color:
+                                          Color.fromRGBO(24, 144, 255, 1.0))),
+                              child: Image.asset(
+                                "assets/images/mobile-logo.png",
+                                fit: BoxFit.fitHeight,
+                              ),
+                            )),
                       ],
                     ),
                   ),

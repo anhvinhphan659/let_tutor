@@ -23,10 +23,10 @@ class ListCoursePage extends StatefulWidget {
 class _ListCoursePageState extends State<ListCoursePage> {
   final TextEditingController courseSearchController = TextEditingController();
   //--handle for search data
-  String q = "";
-  List<int> level = [];
-  List<String> categoryId = [];
-  String orderBy = "DESC";
+  String? q;
+  List<int>? level;
+  List<String>? categoryId;
+  String? orderBy;
   //end --handle for search data
   //--handle for pagination
   int pageCount = 1;
@@ -168,7 +168,12 @@ class _ListCoursePageState extends State<ListCoursePage> {
                           height: 40,
                           child: TextField(
                             onSubmitted: (value) {
-                              q = courseSearchController.text;
+                              if (value.isEmpty) {
+                                q = null;
+                              } else {
+                                q = courseSearchController.text;
+                              }
+
                               updateDisplayData();
                             },
                             controller: courseSearchController,
@@ -201,13 +206,16 @@ class _ListCoursePageState extends State<ListCoursePage> {
                     buttonText: Text("Select level"),
                     title: Text("Select level"),
                     // title: Text("Select category"),
-                    initialValue: level,
+                    initialValue: level ?? <int>[],
                     items: List.generate(levels.length,
                         (index) => MultiSelectItem(index, levels[index])),
                     onConfirm: (val) {
-                      level.clear();
-                      level = val;
-                      print(level);
+                      if (val.isEmpty) {
+                        level = null;
+                      } else {
+                        level = val;
+                      }
+
                       updateDisplayData();
                     },
                   ),
@@ -227,12 +235,15 @@ class _ListCoursePageState extends State<ListCoursePage> {
                         .map((e) => MultiSelectItem(e.id, e.title ?? ""))
                         .toList(),
                     onConfirm: (val) {
-                      print(val);
-                      categoryId.clear();
-                      for (var v in val) {
-                        if (v != null) {
-                          categoryId.add(v);
+                      if (val.isNotEmpty) {
+                        categoryId = [];
+                        for (var v in val) {
+                          if (v != null) {
+                            categoryId!.add(v);
+                          }
                         }
+                      } else {
+                        categoryId = null;
                       }
                       updateDisplayData();
                     },
@@ -285,8 +296,10 @@ class _ListCoursePageState extends State<ListCoursePage> {
                   setState(() {
                     courseSearchController.clear();
                     //update query params
-                    q = "";
-                    orderBy = "DESC";
+                    level = null;
+                    categoryId = null;
+                    q = null;
+                    orderBy = null;
 
                     //update option
                     _sortOptionSelected = null;

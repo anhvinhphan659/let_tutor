@@ -76,6 +76,7 @@ class UserController {
       "level": user.level,
       "learnTopics": learnTopics,
       "testPreparations": testPreparations,
+      "studySchedule": user.studySchedule
     };
 
     print(dataBody);

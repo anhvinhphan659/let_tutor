@@ -189,5 +189,6 @@ class SettingPage extends StatelessWidget {
     await DataHandler.removeKey("Password");
     await DataHandler.removeKey("accessToken");
     await DataHandler.removeKey("refreshToken");
+    await DataHandler.removeKey("googleLoginEmail");
   }
 }

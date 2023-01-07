@@ -368,6 +368,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   user.birthday = DateFormat("y-MM-dd")
                                       .format(_birthdaySelected);
                                   user.level = _levelSelected;
+                                  user.studySchedule = _studyController.text;
 
                                   UserController.updatePersonalInformation(
                                     user,
