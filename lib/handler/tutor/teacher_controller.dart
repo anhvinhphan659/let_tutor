@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:let_tutor/handler/api_handler.dart';
+import 'package:let_tutor/models/teacher/feedback.dart';
 import 'package:let_tutor/models/teacher/teacher.dart';
 import 'package:let_tutor/models/teacher/teacher_detail.dart';
 
@@ -102,5 +103,26 @@ class TeacherController {
       "content": content,
     });
     print(respond.statusCode);
+  }
+
+  static Future<Map<String, dynamic>> getListFeedbackByTeacher(String teacherID,
+      {int page = 1, int perPage = 12}) async {
+    String requestUrl = "${baseUrl}feedback/v2/$teacherID";
+    int count = 0;
+    List<FeedbackTeacher> feedbacks = [];
+    Response respond = await ApiHandler.handler.get(
+      requestUrl,
+      options: ApiHandler.getHeaders(),
+      queryParameters: {"page": page, "perPage": perPage},
+    );
+    if (respond.statusCode == 200) {
+      count = respond.data['data']['count'] ?? 0;
+
+      var feedbackData = respond.data['data']['rows'] as List<dynamic>;
+      for (dynamic feedback in feedbackData) {
+        feedbacks.add(FeedbackTeacher.fromJson(feedback));
+      }
+    }
+    return {"count": count, "listFeedback": feedbacks};
   }
 }

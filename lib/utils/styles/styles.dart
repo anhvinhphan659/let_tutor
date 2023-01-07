@@ -154,6 +154,14 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Colors.white,
       height: 1.45);
+
+  static const TextStyle commentText = TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.normal,
+      fontFamily: 'Roboto, sans-serif',
+      color: Colors.grey,
+      height: 1.45);
+
   //---------------------------------------//
 //course pages
   static TextStyle courseTitle = const TextStyle(

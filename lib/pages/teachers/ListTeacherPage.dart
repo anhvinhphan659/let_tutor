@@ -162,7 +162,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
       }
     }
     sortListTeacher();
-//prevent back after sign in
+    //prevent back after sign in
     return WillPopScope(
       onWillPop: () async {
         return false;
@@ -389,7 +389,7 @@ class _ListTeacherPageState extends State<ListTeacherPage> {
                               Container(
                                 width: 250,
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 4.0, vertical: 1.0),
+                                    horizontal: 16.0, vertical: 1.0),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
                                     border: Border.all(

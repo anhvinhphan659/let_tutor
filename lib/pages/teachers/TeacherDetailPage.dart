@@ -13,6 +13,7 @@ import 'package:let_tutor/utils/components/teachers/BookingTable.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
+import 'package:let_tutor/utils/components/teachers/TeacherFeedbackDiaglog.dart';
 import 'package:let_tutor/utils/data/country.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
@@ -77,7 +78,9 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
   void getListScheduleInWeek() {
     print("call schefule controller");
-
+    setState(() {
+      bookingSchedule = <TeacherSchedule>[];
+    });
     ScheduleController.getScheduleByTutor(teacher.userId!,
             startTime: initialDate)
         .then((value) {
@@ -199,6 +202,12 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                                             color: Colors.grey,
                                             size: 12,
                                           ),
+                                        ),
+                                        Text(
+                                          (teacherDetail.totalFeedback ?? 0) > 0
+                                              ? " (${teacherDetail.totalFeedback})"
+                                              : "",
+                                          style: LettutorFontStyles.reviewText,
                                         ),
                                       ],
                                     )
@@ -403,7 +412,15 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                         ),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  content:
+                                      TeacherFeedbackDialog(teacher: teacher)));
+                        },
                         child: Column(
                           children: [
                             Icon(
@@ -534,6 +551,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                             initialDate = DateTime.now();
                             print('New inital: ' + initialDate.toString());
                           });
+                          getListScheduleInWeek();
                         },
                         child: Text('Today'),
                       ),
@@ -541,10 +559,14 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                         onPressed: () {
                           var newInitalDate =
                               initialDate.subtract(const Duration(days: 7));
-                          if (newInitalDate.isBefore(DateTime.now()) == false) {
+
+                          if ((newInitalDate.millisecondsSinceEpoch -
+                                  DateTime.now().millisecondsSinceEpoch) >
+                              -3600 * 24 * 1000) {
                             setState(() {
                               initialDate = newInitalDate;
                             });
+                            getListScheduleInWeek();
                           }
                         },
                         child: Icon(
@@ -558,6 +580,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                             initialDate =
                                 initialDate.add(const Duration(days: 7));
                           });
+                          getListScheduleInWeek();
                         },
                         child: Icon(
                           Icons.chevron_right,

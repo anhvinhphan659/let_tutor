@@ -95,123 +95,134 @@ class BookingTable extends StatelessWidget {
           DateTime.fromMillisecondsSinceEpoch(schedule.endTimestamp ?? 0);
       DateFormat df = DateFormat("HH:mm");
       String period = "${df.format(startPeriod)}-${df.format(endPeriod)}";
-      bool canBool = DateTime.now().compareTo(startPeriod) < 0;
+      bool canBook = DateTime.now().compareTo(startPeriod) < 0;
+      bool isReversed = schedule.isReversedClass();
 
       if (tableDataMap[period] != null) {
         bool isBooked =
             schedule.getListUserID().contains(UserController.currentUser.id);
-        tableDataMap[period]![startPeriod.day - initialDate!.day + 1] =
+        //if schedule is booked or is reversed
+        if (isBooked || isReversed) {
+          canBook = false;
+        }
+        tableDataMap[period]![(startPeriod.day - initialDate!.day + 1) % 7] =
             DataCell(
                 child: GestureDetector(
           onTap: () {
-            String bookingTime =
-                "$period ${DateFormat("EEEE, d MMMM yyyy").format(startPeriod)}";
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                elevation: 1.0,
-                title: Text("Booking details"),
-                content: Container(
-                  padding: EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      UserTitleHeader("Booking Time", isCompulsory: false),
-                      Container(
-                          margin: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: const Color.fromRGBO(238, 234, 255, 1.0),
-                              borderRadius: BorderRadius.circular(5.0)),
-                          child: Text(
-                            bookingTime,
-                            style: LettutorFontStyles.bookingTimeText,
-                          )),
-                      UserTitleHeader("Note", isCompulsory: false),
-                      TextFormField(
-                        maxLines: 5,
-                        minLines: 4,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6.0),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9D9D9),
+            if (canBook) {
+              String bookingTime =
+                  "$period ${DateFormat("EEEE, d MMMM yyyy").format(startPeriod)}";
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  elevation: 1.0,
+                  title: Text("Booking details"),
+                  content: Container(
+                    padding: EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        UserTitleHeader("Booking Time", isCompulsory: false),
+                        Container(
+                            margin: const EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: const Color.fromRGBO(238, 234, 255, 1.0),
+                                borderRadius: BorderRadius.circular(5.0)),
+                            child: Text(
+                              bookingTime,
+                              style: LettutorFontStyles.bookingTimeText,
+                            )),
+                        UserTitleHeader("Note", isCompulsory: false),
+                        TextFormField(
+                          maxLines: 5,
+                          minLines: 4,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFD9D9D9),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF40A9FF),
+                              ),
                             ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6.0),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF40A9FF),
-                            ),
-                          ),
+                          controller: _noteController,
                         ),
-                        controller: _noteController,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text("Cancel")),
-                  ElevatedButton(
-                      onPressed: () async {
-                        print(schedule.getListScheduleId());
-                        bool result = await ScheduleController.bookAClass(
-                            schedule.getListScheduleId(), _noteController.text);
-                        if (result) {
-                          if (callBack != null) {
-                            callBack!();
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Cancel")),
+                    ElevatedButton(
+                        onPressed: () async {
+                          print(schedule.getListScheduleId());
+                          bool result = await ScheduleController.bookAClass(
+                              schedule.getListScheduleId(),
+                              _noteController.text);
+                          if (result) {
+                            if (callBack != null) {
+                              callBack!();
+                            }
+
+                            Navigator.pop(context);
+                            showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                      title: const Text("Booking details"),
+                                      content: Container(
+                                          child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.check_circle_sharp,
+                                            color: Colors.green,
+                                          ),
+                                          Text(
+                                            "Booking success",
+                                            style: LettutorFontStyles.normalText
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                          ),
+                                          Text(
+                                            "Check your mail's inbox to see detail order",
+                                            style:
+                                                LettutorFontStyles.normalText,
+                                          )
+                                        ],
+                                      )),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("Done"))
+                                      ],
+                                    ));
                           }
 
-                          Navigator.pop(context);
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    title: const Text("Booking details"),
-                                    content: Container(
-                                        child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Icons.check_circle_sharp,
-                                          color: Colors.green,
-                                        ),
-                                        Text(
-                                          "Booking success",
-                                          style: LettutorFontStyles.normalText
-                                              .copyWith(
-                                                  fontWeight: FontWeight.w600),
-                                        ),
-                                        Text(
-                                          "Check your mail's inbox to see detail order",
-                                          style: LettutorFontStyles.normalText,
-                                        )
-                                      ],
-                                    )),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("Done"))
-                                    ],
-                                  ));
-                        }
-
-                        _noteController.clear();
-                      },
-                      child: Text(">> Book")),
-                ],
-              ),
-            );
+                          _noteController.clear();
+                        },
+                        child: Text(">> Book")),
+                  ],
+                ),
+              );
+            }
           },
           child: BookingCell(
             isBooked: isBooked,
-            canBook: canBool,
+            canBook: canBook,
+            isReversed: isReversed,
           ),
         ));
       }
@@ -293,28 +304,48 @@ class BookingTable extends StatelessWidget {
 
 class BookingCell extends StatelessWidget {
   final bool isBooked;
-  bool canBook;
-  BookingCell({Key? key, this.isBooked = false, this.canBook = true})
+  final bool canBook;
+  final bool isReversed;
+  const BookingCell(
+      {Key? key,
+      this.isBooked = false,
+      this.canBook = true,
+      this.isReversed = false})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // ignore: prefer_conditional_assignment
-    // if (canBook == null) {
-    //   canBook = isBooked;
-    // }
+    //handle display
+    String displayText = "Book";
+    Color backgroundColor = Colors.blue;
+    Color textColor = Colors.white;
+    Color borderColor = Colors.white;
+    if (isReversed) {
+      displayText = "Reserved";
+      backgroundColor = Colors.white;
+      textColor = Colors.grey;
+    } else {
+      if (!canBook) {
+        backgroundColor = Colors.grey.shade300;
+        textColor = borderColor = Colors.grey.shade400;
+      }
+    }
+    if (isBooked) {
+      displayText = "Booked";
+      backgroundColor = Colors.white;
+      borderColor = Colors.white;
+      textColor = Colors.green;
+    }
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
-          color: isBooked!
-              ? Colors.white
-              : (canBook ? Colors.blue : Colors.grey.shade200),
-          borderRadius: BorderRadius.circular(16.0)),
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: borderColor)),
       child: Text(
-        isBooked ? 'Booked' : 'Book',
-        style: TextStyle(
-            color: isBooked ? Colors.green : Colors.white, fontSize: 12),
+        displayText,
+        style: TextStyle(color: textColor, fontSize: 12),
       ),
     );
   }

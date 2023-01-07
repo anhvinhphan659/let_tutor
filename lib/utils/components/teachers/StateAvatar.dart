@@ -26,28 +26,25 @@ class StateAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     // double dx = backgroundRadius * (1 + sqrt(2) / 2);
 
-    return Container(
-      padding: const EdgeInsets.all(2.0),
-      child: Stack(
-        children: [
-          Container(
-            height: backgroundRadius * 2,
-            width: backgroundRadius * 2,
-            color: Colors.white,
-            child: ClipOval(child: child),
-          ),
-          displayTop
-              ? Positioned(
-                  top: dx,
-                  left: dx,
-                  child: CircleAvatar(
-                    radius: foregroundRadius,
-                    backgroundColor: backgroundTopColor ?? Colors.green,
-                    child: topWidget,
-                  ))
-              : const SizedBox(),
-        ],
-      ),
+    return Stack(
+      children: [
+        Container(
+          height: backgroundRadius * 2,
+          width: backgroundRadius * 2,
+          color: Colors.white,
+          child: ClipOval(child: child),
+        ),
+        displayTop
+            ? Positioned(
+                top: dx,
+                left: dx,
+                child: CircleAvatar(
+                  radius: foregroundRadius,
+                  backgroundColor: backgroundTopColor ?? Colors.green,
+                  child: topWidget,
+                ))
+            : const SizedBox(),
+      ],
     );
   }
 }

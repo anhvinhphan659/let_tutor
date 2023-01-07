@@ -38,7 +38,7 @@ class AuthController {
     return "ERROR";
   }
 
-  static Future<void> refreshAccessToken() async {
+  static Future<bool> refreshAccessToken() async {
     final refreshToken = DataHandler.getData("refreshToken");
     if (refreshToken != null) {
       final response = await ApiHandler.handler.post(
@@ -48,8 +48,11 @@ class AuthController {
       if (response.statusCode == 200) {
         var body = response.data;
         handleTokenData(body);
+        return true;
       }
     }
+
+    return false;
   }
 
   static void handleTokenData(dynamic body) {
@@ -60,8 +63,9 @@ class AuthController {
     ApiHandler.handler.interceptors.add(
       InterceptorsWrapper(
         onError: (error, handler) async {
-          if (error.response!.statusCode == 401) {
-            await refreshAccessToken();
+          bool refresh = await refreshAccessToken();
+          if (refresh == false) {
+            print("Error");
           }
         },
       ),
