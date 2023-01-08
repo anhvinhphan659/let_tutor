@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
@@ -9,6 +11,7 @@ import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
 import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
@@ -46,37 +49,65 @@ class _ProfilePageState extends State<ProfilePage> {
     "PROFICIENCY": "C2 (Proficiency)",
   };
 
+  List<int> wtlIndex = [];
+
+  var topics = [
+    ...UtilStorage.learnTopics,
+    ...UtilStorage.testPreparations,
+  ];
+
+  int getIndexInTopics(LearnTopics topic) {
+    for (int i = 0; i < topics.length; i++) {
+      if (topic.name!.contains(topics[i].name!)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _studyController = TextEditingController();
   User user = UserController.currentUser;
-  String _levelSelected = "BEGINNER";
+  String? _levelSelected = "BEGINNER";
   DateTime _birthdaySelected = DateTime.now();
   var expandTab = false;
   @override
   Widget build(BuildContext context) {
     // print(user.toJson());
-    print("build");
 
-    List<LearnTopics> initValue = [];
-    initValue.addAll(user.learnTopics ?? []);
-    initValue.addAll((user.testPreparations ?? []));
-    print(initValue);
+    var userTopics = [
+      ...user.learnTopics ?? [],
+      ...user.testPreparations ?? [],
+    ];
+    wtlIndex.clear();
+    for (var t in userTopics) {
+      int index = getIndexInTopics(t);
+      if (index >= 0) {
+        wtlIndex.add(index);
+      }
+    }
+    print("WTL LENGTH: ${wtlIndex.length}");
+
+    print(user.country);
+    print(json.encode(user.toJson()));
     //set up display
     _studyController.text = user.studySchedule ?? "";
-    _levelSelected = user.level ?? "";
-    _birthdaySelected = DateTime.parse(user.birthday ?? "");
+    _levelSelected = user.level;
+    _birthdaySelected =
+        DateTime.tryParse(user.birthday ?? "") ?? DateTime.now();
 
     Widget avatarWidget = DefaultAvatar(teacherName: user.name ?? "");
     if (user.avatar != null) {
       if (!user.avatar!.contains("avatar-default")) {
         avatarWidget = Image.network(
           user.avatar!,
-          fit: BoxFit.fill,
+          fit: BoxFit.fitHeight,
         );
       }
     }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -89,28 +120,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         leadingWidth: 300,
         actions: [
-          PopupMenuButton<int>(
-              offset: Offset(0, 60),
-              icon: Icon(
-                Icons.flag_circle,
-                color: Colors.black,
-              ),
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem<int>(
-                    child: Text('Option 1'),
-                    value: 1,
-                  ),
-                  PopupMenuItem<int>(
-                    child: Text('Option 2'),
-                    value: 2,
-                  ),
-                  PopupMenuItem<int>(
-                    child: Text('Option 3'),
-                    value: 3,
-                  ),
-                ];
-              }),
           IconButton(
             onPressed: () {
               PushTo(context: context, destination: SettingPage());
@@ -186,11 +195,36 @@ class _ProfilePageState extends State<ProfilePage> {
                         UserTitleHeader("Name"),
                         CustomTextField(_nameController,
                             initialText: user.name!),
-                        UserTitleHeader("Email Address"),
+                        UserTitleHeader("Email Address", isCompulsory: false),
                         CustomTextField(_emailController,
                             enabled: false, initialText: user.email!),
                         UserTitleHeader("Country"),
-                        TextField(),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6.0),
+                            border: Border.all(
+                              color: Color(0xFFD9D9D9),
+                            ),
+                          ),
+                          child: DropdownButton(
+                              underline: const SizedBox(),
+                              isExpanded: true,
+                              value: user.country,
+                              items: (UtilStorage.countries)
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.code ?? "",
+                                      child: Text(e.name ?? ""),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  user.country = value;
+                                });
+                              }),
+                        ),
                         UserTitleHeader("Phone number"),
                         CustomTextField(_phoneController,
                             initialText: user.phone!, enabled: false),
@@ -225,7 +259,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(DateFormat('y/M/d')
+                              Text(DateFormat('y-MM-dd')
                                   .format(_birthdaySelected)),
                               GestureDetector(
                                   onTap: () async {
@@ -279,21 +313,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         Container(
                           decoration: BoxDecoration(),
                           child: MultiSelectDialogField(
-                            items: [
-                              ...UtilStorage.learnTopics.map(
-                                (e) => MultiSelectItem(e, e.name ?? ""),
-                              ),
-                              ...UtilStorage.testPreparations.map(
-                                (e) => MultiSelectItem(e, e.name ?? ""),
-                              ),
-                            ],
-                            initialValue: initValue,
+                            items: List.generate(
+                                topics.length,
+                                (index) => MultiSelectItem(
+                                    index, topics[index].name ?? "")),
+                            initialValue: wtlIndex,
                             onConfirm: (result) {
-                              // print(result);
+                              print(result);
+                              wtlIndex = result;
                             },
                           ),
                         ),
-                        UserTitleHeader("Study Schedule"),
+                        UserTitleHeader("Study Schedule", isCompulsory: false),
                         TextFormField(
                             minLines: 4,
                             maxLines: 5,
@@ -318,28 +349,39 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             ElevatedButton(
                                 onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      //call update function
-                                      Future.delayed(
-                                          const Duration(milliseconds: 1000),
-                                          () async {
-                                        Navigator.pop(context);
-                                      });
-                                      return AlertDialog(
-                                          content: Row(
-                                        children: const [
-                                          Icon(
-                                            Icons.verified,
-                                          ),
-                                          Text("Successfull")
-                                        ],
-                                      ));
-                                    },
-                                  );
+                                  int learnTopicsLength =
+                                      UtilStorage.learnTopics.length;
+                                  List<String> learnTopicsIndex = [];
+                                  List<String> testPreparationsIndex = [];
+                                  for (int index in wtlIndex) {
+                                    if (index < learnTopicsLength) {
+                                      if (topics[index].id != null) {
+                                        learnTopicsIndex
+                                            .add(topics[index].id.toString());
+                                      }
+                                    } else {
+                                      testPreparationsIndex
+                                          .add(topics[index].id.toString());
+                                    }
+                                  }
+                                  user.name = _nameController.text;
+                                  user.birthday = DateFormat("y-MM-dd")
+                                      .format(_birthdaySelected);
+                                  user.level = _levelSelected;
+                                  user.studySchedule = _studyController.text;
+
+                                  UserController.updatePersonalInformation(
+                                    user,
+                                    testPreparations: testPreparationsIndex,
+                                    learnTopics: learnTopicsIndex,
+                                  ).then((value) {
+                                    if (value) {
+                                      displayMessage(context,
+                                          message: "Successfull");
+                                    }
+                                  });
                                 },
-                                child: Text('Save changes')),
+                                child: const Text('Save changes')),
                           ],
                         )
                       ],
@@ -367,7 +409,7 @@ Widget UserTitleHeader(String title, {bool isCompulsory = true}) {
                 style:
                     LettutorFontStyles.normalText.copyWith(color: Colors.red))
             : const TextSpan(text: ''),
-        TextSpan(text: title, style: LettutorFontStyles.h5Text)
+        TextSpan(text: title, style: LettutorFontStyles.h5Title)
       ]),
     ),
   );

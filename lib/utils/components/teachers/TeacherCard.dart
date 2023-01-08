@@ -12,16 +12,9 @@ import 'package:let_tutor/utils/util_function.dart';
 
 class TeacherCard extends StatelessWidget {
   final Teacher teacher;
-  bool isActive;
 
-  bool isFavorite;
-  Function? onFavoriteTap;
-  TeacherCard(
-      {required this.teacher,
-      this.isActive = false,
-      this.isFavorite = false,
-      this.onFavoriteTap,
-      Key? key})
+  final Function? onFavoriteTap;
+  const TeacherCard({required this.teacher, this.onFavoriteTap, Key? key})
       : super(key: key);
 
   @override
@@ -42,7 +35,7 @@ class TeacherCard extends StatelessWidget {
       countryName = country.name ?? "";
     }
 
-    bool hasReview = (teacher.feedbacks ?? []).length > 0;
+    bool hasReview = teacher.rating != null;
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -160,7 +153,7 @@ class TeacherCard extends StatelessWidget {
                 onPressed: () {
                   onFavoriteTap!();
                 },
-                icon: isFavorite
+                icon: teacher.isFavoriteTutor != null
                     ? Icon(
                         Icons.favorite,
                         color: Colors.red,

@@ -4,7 +4,7 @@ class TeacherDetail {
   String? education;
   String? experience;
   String? profession;
-  Null? accent;
+  String? accent;
   String? targetStudent;
   String? interests;
   String? languages;
@@ -51,7 +51,7 @@ class TeacherDetail {
         ? new TeacherDetailUser.fromJson(json['User'])
         : null;
     isFavorite = json['isFavorite'];
-    avgRating = json['avgRating'];
+    avgRating = double.parse(json['avgRating'].toString());
     totalFeedback = json['totalFeedback'];
   }
 

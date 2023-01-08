@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:let_tutor/handler/auth/auth_controller.dart';
+import 'package:let_tutor/handler/course/course_controller.dart';
+import 'package:let_tutor/handler/user/user_controller.dart';
+import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/pages/auth/LoginPage.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:let_tutor/utils/util_function.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -11,6 +18,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  bool isRequestSending = false;
   final TextEditingController _usernameTxtController = TextEditingController();
   final TextEditingController _passwordTxtController = TextEditingController();
   @override
@@ -41,26 +49,26 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   Center(
                     child: Text(
-                      "Đăng ký",
+                      "Start learning with LetTutor",
                       style: LettutorFontStyles.formTitle,
                     ),
                   ),
                   Center(
                     child: Text(
-                      'Phát triển kỹ năng tiếng Anh nhanh nhất bằng cách học 1 kèm 1 trực tuyến theo mục tiêu và lộ trình dành cho riêng bạn.',
+                      'Become fluent faster through one on one video chat lessons tailored to your goals.',
                       style: LettutorFontStyles.formDescription,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
                     child: Text(
-                      'ĐỊA CHỈ EMAIL',
+                      'EMAIL',
                       style: LettutorFontStyles.formLabel,
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(0.0),
-                    child: TextField(
+                    child: TextFormField(
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -71,16 +79,18 @@ class _RegisterPageState extends State<RegisterPage> {
                         hintText: "mail@example.com",
                       ),
                       controller: _usernameTxtController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: isValidEmail,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 24.0, bottom: 8.0),
                     child:
-                        Text('MẬT KHẨU', style: LettutorFontStyles.formLabel),
+                        Text('PASSWORD', style: LettutorFontStyles.formLabel),
                   ),
                   Container(
                     padding: const EdgeInsets.only(bottom: 16.0),
-                    child: TextField(
+                    child: TextFormField(
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -90,25 +100,71 @@ class _RegisterPageState extends State<RegisterPage> {
                         contentPadding: EdgeInsets.all(10.0),
                       ),
                       controller: _passwordTxtController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please input your Password!';
+                        }
+                        return null;
+                      },
                       obscureText: true,
                       autocorrect: false,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: LettutorColors.primaryColor,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(6.0))),
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Center(
-                        child: Text(
-                          "ĐĂNG NHẬP",
-                          style: LettutorFontStyles.formDescription.copyWith(
-                            fontSize: 20,
-                            color: Colors.white,
+                  AnimatedOpacity(
+                    duration: const Duration(seconds: 0),
+                    opacity: isRequestSending ? 0.3 : 1.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                          color: LettutorColors.primaryColor,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(6.0))),
+                      child: TextButton(
+                        onPressed: () async {
+                          String email = _usernameTxtController.text;
+                          String password = _passwordTxtController.text;
+                          if (password.isEmpty || isValidEmail(email) != null) {
+                            return;
+                          }
+                          setState(() {
+                            isRequestSending = true;
+                          });
+                          try {
+                            bool result = await AuthController.registerAccount(
+                                email, password);
+                            setState(() {
+                              isRequestSending = false;
+                            });
+                            print("Sign up: " + result.toString());
+                            if (result) {
+                              _usernameTxtController.clear();
+                              _passwordTxtController.clear();
+                              PushTo(
+                                  context: context,
+                                  destination: const LoginPage());
+                            }
+                          } catch (e) {
+                            //
+                          }
+                        },
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              isRequestSending
+                                  ? const CircularProgressIndicator()
+                                  : const SizedBox(),
+                              Text(
+                                "SIGN UP",
+                                style:
+                                    LettutorFontStyles.formDescription.copyWith(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -118,7 +174,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     padding: const EdgeInsets.only(top: 34.0),
                     child: Center(
                       child: Text(
-                        'Hoặc tiếp tục với',
+                        'Or continue with',
                         style: LettutorFontStyles.normalText,
                       ),
                     ),
@@ -129,11 +185,50 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                            onPressed: () {}, icon: Icon(Icons.facebook)),
-                        IconButton(onPressed: () {}, icon: Icon(Icons.zoom_in)),
+                            onPressed: () {
+                              facebookSignInHandle();
+                            },
+                            icon: SvgPicture.asset(
+                              "assets/icons/facebook-logo.svg",
+                              fit: BoxFit.fitHeight,
+                              height: 60,
+                            )),
+                        IconButton(
+                            onPressed: () async {
+                              var res = await googleSignInHandle();
+                              if (res) {
+                                UserController.getUserInformation();
+                                CourseController.getAllContentCategory()
+                                    .then((value) {
+                                  UtilStorage.contentCategories = value;
+                                });
+
+                                print("Go to list teacher page");
+
+                                PushTo(
+                                    context: context,
+                                    destination: ListTeacherPage());
+                              }
+                            },
+                            icon: SvgPicture.asset(
+                              "assets/icons/google-logo.svg",
+                              fit: BoxFit.fitHeight,
+                              height: 55,
+                            )),
                         IconButton(
                             onPressed: () {},
-                            icon: Icon(Icons.phone_android_outlined)),
+                            icon: Container(
+                              padding: const EdgeInsets.all(5.0),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color:
+                                          Color.fromRGBO(24, 144, 255, 1.0))),
+                              child: Image.asset(
+                                "assets/images/mobile-logo.png",
+                                fit: BoxFit.fitHeight,
+                              ),
+                            )),
                       ],
                     ),
                   ),
@@ -143,11 +238,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Đã tài khoản?',
+                          'Already have an account?',
                           style: LettutorFontStyles.normalText,
                         ),
                         TextButton(
-                          child: Text('Đăng nhập',
+                          child: Text('Log in',
                               style: LettutorFontStyles.normalText.copyWith(
                                 color: LettutorColors.lightBlueColor,
                               )),

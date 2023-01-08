@@ -61,7 +61,7 @@ class LettutorFontStyles {
       height: 1.2);
   static TextStyle largeLabelText = TextStyle(
       fontSize: 30,
-      fontWeight: FontWeight.normal,
+      fontWeight: FontWeight.w600,
       fontFamily: 'Poppins, sans-serif',
       color: Colors.black.withOpacity(0.85),
       height: 1.45);
@@ -128,7 +128,7 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Color.fromRGBO(120, 120, 120, 1.0),
       height: 1.45);
-  static TextStyle h5Text = const TextStyle(
+  static TextStyle h5Title = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w600,
       fontFamily: 'Roboto, sans-serif',
@@ -154,6 +154,14 @@ class LettutorFontStyles {
       fontFamily: 'Roboto, sans-serif',
       color: Colors.white,
       height: 1.45);
+
+  static const TextStyle commentText = TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.normal,
+      fontFamily: 'Roboto, sans-serif',
+      color: Colors.grey,
+      height: 1.45);
+
   //---------------------------------------//
 //course pages
   static TextStyle courseTitle = const TextStyle(

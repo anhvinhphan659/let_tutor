@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:let_tutor/handler/course/course_controller.dart';
+import 'package:let_tutor/handler/data_handler.dart';
 import 'package:let_tutor/handler/user/user_controller.dart';
 import 'package:let_tutor/models/user.dart';
 import 'package:let_tutor/pages/account/ChangePasswordPage.dart';
@@ -14,6 +17,7 @@ import 'package:let_tutor/pages/teachers/ListTeacherPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
 import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 import 'package:let_tutor/utils/styles/styles.dart';
 
 class SettingPage extends StatelessWidget {
@@ -27,7 +31,7 @@ class SettingPage extends StatelessWidget {
       if (!user.avatar!.contains("avatar-default")) {
         avatarWidget = Image.network(
           user.avatar!,
-          fit: BoxFit.fill,
+          fit: BoxFit.cover,
         );
       }
     }
@@ -70,6 +74,10 @@ class SettingPage extends StatelessWidget {
       {
         "icon": 'assets/icons/graduation-cap.svg',
         "function": () {
+          CourseController.getAllContentCategory().then((value) {
+            UtilStorage.contentCategories = value;
+            print("Category get: " + value.length.toString());
+          });
           PushTo(context: context, destination: ListCoursePage());
         },
         "screen": "Courses",
@@ -90,6 +98,7 @@ class SettingPage extends StatelessWidget {
         "icon": 'assets/icons/sign-out-alt.svg',
         "screen": "Logout",
         "function": () {
+          _logOutHandler();
           PushTo(context: context, destination: LoginPage());
         },
       },
@@ -167,5 +176,19 @@ class SettingPage extends StatelessWidget {
         )
       ]),
     );
+  }
+
+  Future<void> _logOutHandler() async {
+    String? googleLoginEmail = await DataHandler.getData("googleLoginEmail");
+    if (googleLoginEmail != null) {
+      print("Sign out google email login");
+      print("Email: " + googleLoginEmail);
+      GoogleSignIn().signOut();
+    }
+    await DataHandler.removeKey("Email");
+    await DataHandler.removeKey("Password");
+    await DataHandler.removeKey("accessToken");
+    await DataHandler.removeKey("refreshToken");
+    await DataHandler.removeKey("googleLoginEmail");
   }
 }

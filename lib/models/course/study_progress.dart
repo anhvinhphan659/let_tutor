@@ -37,7 +37,7 @@ class LatestLearningDate {
   int? id;
   String? studentId;
   String? eBookId;
-  Null? topicId;
+  String? topicId;
   String? bookingId;
   int? currentPage;
   String? latestDate;

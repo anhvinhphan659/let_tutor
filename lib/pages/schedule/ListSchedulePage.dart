@@ -178,6 +178,9 @@ class _ListSchedulePageState extends State<ListSchedulePage> {
                           ...listSchedules.map(
                             (e) => ScheduleCard(
                               schedule: e,
+                              onCancelCallBack: () {
+                                updateListSchedule();
+                              },
                             ),
                           ),
                           listSchedules.isNotEmpty

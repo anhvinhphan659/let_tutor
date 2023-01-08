@@ -6,8 +6,12 @@ import 'package:let_tutor/models/course/course.dart';
 import 'package:let_tutor/models/course/e_book.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/courses/CourseCard.dart';
+import 'package:let_tutor/utils/data/util_storage.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
+import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:number_paginator/number_paginator.dart';
 
 class ListCoursePage extends StatefulWidget {
   const ListCoursePage({Key? key}) : super(key: key);
@@ -17,6 +21,17 @@ class ListCoursePage extends StatefulWidget {
 }
 
 class _ListCoursePageState extends State<ListCoursePage> {
+  final TextEditingController courseSearchController = TextEditingController();
+  //--handle for search data
+  String? q;
+  List<int>? level;
+  List<String>? categoryId;
+  String? orderBy;
+  //end --handle for search data
+  //--handle for pagination
+  int pageCount = 1;
+  int _currentPage = 1;
+  //end --handle for pagination
   bool isLoading = true;
   @override
   void initState() {
@@ -27,13 +42,7 @@ class _ListCoursePageState extends State<ListCoursePage> {
   }
 
   Future<void> initData() async {
-    List<Course> courses = await CourseController.getListCourse();
-    List<EBook> ebooks = await CourseController.getListEBook();
-    setState(() {
-      tabOptions["Course"] = CourseController.getCourseCardsFromList(courses);
-      tabOptions["E-Book"] = CourseController.getEbookCardsFromList(ebooks);
-      isLoading = false;
-    });
+    await updateDisplayData();
   }
 
   var searchOptionsHeaders = [
@@ -52,32 +61,71 @@ class _ListCoursePageState extends State<ListCoursePage> {
       "Pre-Advanced",
       "Advanced",
     ],
-    [
-      "For Studing Abroad",
-      "English for Kid",
-      "English for Traveling",
-      "Conversational English",
-      "Business English",
-      "STARTERS",
-      "MOVERS",
-      "FLYERS",
-      "KET",
-      "PET",
-      "IELTS",
-      "TOEFL",
-      "TOEIC",
-    ],
-    [
-      "Level decreasing",
-      "Level increasing",
-    ]
   ];
+
+  var levels = [
+    "Any Level",
+    "Beginner",
+    "Higher Beginner",
+    "Pre-Intermediate",
+    "Intermediate",
+    "Upper-Intermediate",
+    "Pre-Advanced",
+    "Advanced",
+  ];
+
+  var categories = [
+    ...UtilStorage.contentCategories,
+  ];
+
+  var sortSelections = {
+    "Level Descreasing": 0,
+    "Level Increasing": 1,
+  };
   Map<String, List<Widget>> tabOptions = {
     "Course": [],
     "E-Book": [],
     "Interactive E-book": [],
   };
   String _selectedTab = 'Course';
+  int? _sortOptionSelected;
+  Future updateDisplayData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    if (_selectedTab.contains("Course")) {
+      print("Course update");
+      print(orderBy);
+      List<Course> courses = await CourseController.getListCourse(
+        level: level,
+        q: q,
+        orderBy: orderBy,
+        categoryId: categoryId,
+      );
+      setState(() {
+        tabOptions["Course"] = CourseController.getCourseCardsFromList(courses);
+      });
+    } else if (_selectedTab.contains("Book")) {
+      var result = await CourseController.getListEBook(
+        page: _currentPage,
+        perPage: 10,
+        level: level,
+        q: q,
+        orderBy: orderBy,
+        categoryId: categoryId,
+      );
+      int count = result['count'] ?? 0;
+      pageCount = (count / 10).ceil();
+      List<EBook> ebooks = result["e-books"] ?? <EBook>[];
+      tabOptions["E-Book"] = CourseController.getEbookCardsFromList(ebooks);
+    }
+    setState(() {
+      print("Call end update");
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // var screenWidth = MediaQuery.of(context).size.width;
@@ -85,10 +133,12 @@ class _ListCoursePageState extends State<ListCoursePage> {
 
     courseWidgets = tabOptions[_selectedTab] ?? [] as List<Widget>;
 
+    var screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      appBar: LettutorAppBar(),
+      appBar: const LettutorAppBar(),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
         color: Colors.white,
         child: ListView(
           shrinkWrap: true,
@@ -113,13 +163,24 @@ class _ListCoursePageState extends State<ListCoursePage> {
                     ),
                     Row(
                       children: [
-                        const SizedBox(
-                            width: 100,
-                            height: 50,
-                            child: TextField(
-                              decoration:
-                                  InputDecoration(border: OutlineInputBorder()),
-                            )),
+                        SizedBox(
+                          width: 100,
+                          height: 40,
+                          child: TextField(
+                            onSubmitted: (value) {
+                              if (value.isEmpty) {
+                                q = null;
+                              } else {
+                                q = courseSearchController.text;
+                              }
+
+                              updateDisplayData();
+                            },
+                            controller: courseSearchController,
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder()),
+                          ),
+                        ),
                         IconButton(onPressed: () {}, icon: Icon(Icons.search))
                       ],
                     )
@@ -134,28 +195,93 @@ class _ListCoursePageState extends State<ListCoursePage> {
             ),
             Wrap(
               children: [
-                ...List.generate(
-                    searchOptionWidgets.length,
-                    (index) => Container(
-                          // decoration: BoxDecoration(
-                          //     border: Border.all(
-                          //         width: 1.0,
-                          //         color: LettutorColors.lightGrayColor)),
-                          padding: EdgeInsets.all(10),
-                          constraints: BoxConstraints(maxWidth: 175),
-                          child: GFMultiSelect(
-                            dropdownTitleTileBorder: Border.all(
-                                width: 1.0,
-                                color: LettutorColors.lightGrayColor),
-                            dropdownTitleTilePadding: EdgeInsets.zero,
-                            dropdownTitleTileMargin: EdgeInsets.zero,
-                            items: searchOptionWidgets[index],
-                            dropdownTitleTileHintText:
-                                searchOptionsHeaders[index],
-                            dropdownTitleTileText: "",
-                            onSelect: (value) {},
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(10),
+                  constraints: BoxConstraints(maxWidth: screenWidth * .8),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 1.0, color: LettutorColors.lightGrayColor)),
+                  child: MultiSelectDialogField(
+                    buttonText: Text("Select level"),
+                    title: Text("Select level"),
+                    // title: Text("Select category"),
+                    initialValue: level ?? <int>[],
+                    items: List.generate(levels.length,
+                        (index) => MultiSelectItem(index, levels[index])),
+                    onConfirm: (val) {
+                      if (val.isEmpty) {
+                        level = null;
+                      } else {
+                        level = val;
+                      }
+
+                      updateDisplayData();
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(10),
+                  constraints: BoxConstraints(maxWidth: screenWidth * .8),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 1.0, color: LettutorColors.lightGrayColor)),
+                  child: MultiSelectDialogField(
+                    // title: Text("Select category"),
+                    buttonText: Text("Select category"),
+                    title: Text("Select category"),
+                    items: categories
+                        .map((e) => MultiSelectItem(e.id, e.title ?? ""))
+                        .toList(),
+                    onConfirm: (val) {
+                      if (val.isNotEmpty) {
+                        categoryId = [];
+                        for (var v in val) {
+                          if (v != null) {
+                            categoryId!.add(v);
+                          }
+                        }
+                      } else {
+                        categoryId = null;
+                      }
+                      updateDisplayData();
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(10),
+                  constraints: BoxConstraints(maxWidth: screenWidth * 0.8),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 1.0, color: LettutorColors.lightGrayColor)),
+                  child: DropdownButton(
+                    isExpanded: true,
+                    underline: const SizedBox(),
+                    hint: Text("Sort by level"),
+                    items: sortSelections.keys
+                        .map(
+                          (e) => DropdownMenuItem(
+                            child: Text(e),
+                            value: sortSelections[e],
                           ),
-                        ))
+                        )
+                        .toList(),
+                    value: _sortOptionSelected,
+                    onChanged: (value) {
+                      setState(() {
+                        _sortOptionSelected = value;
+                        if ((_sortOptionSelected ?? 0) == 0) {
+                          orderBy = "DESC";
+                        } else {
+                          orderBy = "ASC";
+                        }
+                        updateDisplayData();
+                      });
+                    },
+                  ),
+                )
               ],
             ),
             DefaultTabController(
@@ -168,23 +294,51 @@ class _ListCoursePageState extends State<ListCoursePage> {
                 ],
                 onTap: (index) {
                   setState(() {
+                    courseSearchController.clear();
+                    //update query params
+                    level = null;
+                    categoryId = null;
+                    q = null;
+                    orderBy = null;
+
+                    //update option
+                    _sortOptionSelected = null;
                     _selectedTab = tabOptions.keys.toList()[index];
                   });
+                  updateDisplayData();
                 },
               ),
             ),
-            courseWidgets.length > 0
-                ? Container(
-                    child: Wrap(
-                      children: courseWidgets,
-                    ),
+            isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
                   )
-                : Column(
-                    children: [
-                      SvgPicture.asset('assets/images/ant_empty_img.svg'),
-                      Text('No data')
-                    ],
-                  ),
+                : courseWidgets.isNotEmpty
+                    ? Container(
+                        child: Wrap(
+                          children: [
+                            ...courseWidgets,
+                            _selectedTab.contains("Book")
+                                ? NumberPaginator(
+                                    numberPages: pageCount,
+                                    initialPage: _currentPage - 1,
+                                    onPageChange: (pageIndex) {
+                                      setState(() {
+                                        _currentPage = pageIndex + 1;
+                                      });
+                                      updateDisplayData();
+                                    },
+                                  )
+                                : const SizedBox(),
+                          ],
+                        ),
+                      )
+                    : Column(
+                        children: [
+                          SvgPicture.asset('assets/images/ant_empty_img.svg'),
+                          Text('No data')
+                        ],
+                      ),
           ],
         ),
       ),

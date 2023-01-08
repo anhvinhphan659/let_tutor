@@ -11,6 +11,9 @@ import 'package:let_tutor/pages/account/SettingPage.dart';
 import 'package:let_tutor/utils/components/common.dart';
 import 'package:let_tutor/utils/components/teachers/BookingTable.dart';
 import 'package:let_tutor/utils/components/teachers/SkillTag.dart';
+import 'package:let_tutor/utils/components/teachers/StateAvatar.dart';
+import 'package:let_tutor/utils/components/teachers/TeacherCard.dart';
+import 'package:let_tutor/utils/components/teachers/TeacherFeedbackDiaglog.dart';
 import 'package:let_tutor/utils/data/country.dart';
 
 import 'package:let_tutor/utils/styles/styles.dart';
@@ -20,7 +23,7 @@ import 'package:video_player/video_player.dart';
 class TeacherDetailPage extends StatefulWidget {
   final Teacher teacher;
 
-  TeacherDetailPage({required this.teacher, Key? key}) : super(key: key);
+  const TeacherDetailPage({required this.teacher, Key? key}) : super(key: key);
 
   @override
   State<TeacherDetailPage> createState() => _TeacherDetailPageState();
@@ -36,29 +39,31 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
   bool isFavorite = false;
   bool isLoading = true;
+
+  bool videoLoading = true;
   DateTime initialDate = DateTime.now();
 
   @override
   void initState() {
     teacher = widget.teacher;
+    print("Teacher video: ${teacher.video ?? ""}");
 
     _controller = VideoPlayerController.network(teacher.video ?? "");
 
-    TeacherController.getTeacherDetail(teacher.userId!).then((value) {
+    TeacherController.getTeacherDetail(teacher.userId!).then((value) async {
       setState(() {
         teacherDetail = value;
+        isFavorite = teacherDetail.isFavorite ?? false;
         isLoading = false;
       });
     });
 
-    isFavorite = teacherDetail.isFavorite ?? false;
-    // _controller.initialize().then((value) async {
-    //   setState(() {
-    //     flickManager = FlickManager(videoPlayerController: _controller);
-    //     isLoading = false;
-    //   });
-    // });
-    // ScheduleController.getScheduleByTutor(teacher.userId ?? "");
+    _controller.initialize().then((value) {
+      flickManager = FlickManager(videoPlayerController: _controller);
+      setState(() {
+        videoLoading = false;
+      });
+    });
     getListScheduleInWeek();
 
     super.initState();
@@ -66,17 +71,21 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
 
   @override
   void dispose() {
-    // flickManager.dispose();
+    flickManager.dispose();
 
     super.dispose();
   }
 
   void getListScheduleInWeek() {
     print("call schefule controller");
+    setState(() {
+      bookingSchedule = <TeacherSchedule>[];
+    });
     ScheduleController.getScheduleByTutor(teacher.userId!,
             startTime: initialDate)
         .then((value) {
       if (value.isNotEmpty) {
+        bookingSchedule.clear();
         setState(() {
           bookingSchedule = value;
         });
@@ -91,6 +100,16 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
     if (country != null) {
       countryName = country.name ?? "";
     }
+    Widget avatarWidget = DefaultAvatar(teacherName: teacher.name ?? "");
+    if (teacher.avatar != null) {
+      if (!teacher.avatar!.contains("avatar-default")) {
+        avatarWidget = Image.network(
+          teacher.avatar!,
+          fit: BoxFit.fitHeight,
+        );
+      }
+    }
+
     return Scaffold(
       appBar: LettutorAppBar(),
       body: isLoading
@@ -108,14 +127,12 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                       children: [
                         Column(
                           children: [
-                            ClipOval(
-                              child: SizedBox.fromSize(
-                                size: const Size.fromRadius(35),
-                                child: Image.asset(
-                                  'assets/images/teacher1.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                            StateAvatar(
+                              foregroundRadius: 5,
+                              backgroundRadius: 30,
+                              dx: 46,
+                              displayTop: teacher.isActivated ?? false,
+                              child: avatarWidget,
                             ),
                           ],
                         ),
@@ -163,26 +180,37 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                                   )
                                 ],
                               ),
-                              Row(
-                                children: [
-                                  ...List.generate(
-                                    (teacher.rating ?? 0.0).floor(),
-                                    (_) => const Icon(
-                                      Icons.star,
-                                      color: Colors.yellow,
-                                      size: 12,
-                                    ),
-                                  ),
-                                  ...List.generate(
-                                    (5 - (teacher.rating ?? 0.0).floor()),
-                                    (_) => const Icon(
-                                      Icons.star,
-                                      color: Colors.grey,
-                                      size: 12,
-                                    ),
-                                  ),
-                                ],
-                              )
+                              (teacherDetail.totalFeedback ?? 0) == 0
+                                  ? Text(
+                                      "No reviews yet",
+                                      style: LettutorFontStyles.reviewText,
+                                    )
+                                  : Row(
+                                      children: [
+                                        ...List.generate(
+                                          (teacher.rating ?? 0.0).floor(),
+                                          (_) => const Icon(
+                                            Icons.star,
+                                            color: Colors.yellow,
+                                            size: 12,
+                                          ),
+                                        ),
+                                        ...List.generate(
+                                          (5 - (teacher.rating ?? 0.0).floor()),
+                                          (_) => const Icon(
+                                            Icons.star,
+                                            color: Colors.grey,
+                                            size: 12,
+                                          ),
+                                        ),
+                                        Text(
+                                          (teacherDetail.totalFeedback ?? 0) > 0
+                                              ? " (${teacherDetail.totalFeedback})"
+                                              : "",
+                                          style: LettutorFontStyles.reviewText,
+                                        ),
+                                      ],
+                                    )
                             ],
                           ),
                         )
@@ -200,6 +228,8 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                     children: [
                       InkWell(
                         onTap: () {
+                          TeacherController.addFavoriteTeacher(
+                              teacher.userId ?? "");
                           setState(() {
                             isFavorite = !isFavorite;
                           });
@@ -226,11 +256,151 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                         ),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          List<bool> options = [false, false, false];
+                          List<String> textOptions = [
+                            "This tutor is annoying me",
+                            "This profile is pretending be someone or is fake",
+                            "Inappropriate profile photo",
+                          ];
+                          bool canSubmit = false;
+                          TextEditingController reportTextController =
+                              TextEditingController();
+                          showModalBottomSheet(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              backgroundColor: Colors.white,
+                              context: context,
+                              builder: (_) =>
+                                  StatefulBuilder(builder: (context, update) {
+                                    return Container(
+                                      height: 400,
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 24.0),
+                                              child: Text(
+                                                "Report ${teacher.name ?? ""}",
+                                                style: LettutorFontStyles
+                                                    .h3Title
+                                                    .copyWith(fontSize: 18),
+                                              ),
+                                            ),
+                                            Divider(),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 24,
+                                                      vertical: 13),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Wrap(
+                                                    children: const [
+                                                      Icon(
+                                                        Icons.report,
+                                                        color: Colors.blue,
+                                                      ),
+                                                      Text(
+                                                          "Help us understand what's happening"),
+                                                    ],
+                                                  ),
+                                                  ...List.generate(
+                                                    options.length,
+                                                    (index) => Row(
+                                                      children: [
+                                                        Checkbox(
+                                                            value:
+                                                                options[index],
+                                                            onChanged: (value) {
+                                                              update(() {
+                                                                options[index] =
+                                                                    value!;
+                                                                for (var item
+                                                                    in options) {
+                                                                  if (item) {
+                                                                    canSubmit =
+                                                                        item;
+                                                                    break;
+                                                                  }
+                                                                }
+
+                                                                if (value) {
+                                                                  reportTextController
+                                                                          .text +=
+                                                                      '${textOptions[index]}\n';
+                                                                }
+                                                              });
+                                                            }),
+                                                        SizedBox(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                .7,
+                                                            child: Text(
+                                                                textOptions[
+                                                                    index]))
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  TextFormField(
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                    controller:
+                                                        reportTextController,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Divider(),
+                                                  Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text("Cancel"),
+                                                      ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          TeacherController
+                                                              .reportTeacher(
+                                                                  teacher.userId ??
+                                                                      "",
+                                                                  content:
+                                                                      reportTextController
+                                                                          .text);
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text("Submit"),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ]),
+                                    );
+                                  }));
+                        },
                         child: Column(
                           children: [
                             Icon(
-                              Icons.report_rounded,
+                              Icons.report_outlined,
                               color: LettutorColors.blueColor,
                             ),
                             Text(
@@ -242,7 +412,15 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                         ),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  content:
+                                      TeacherFeedbackDialog(teacher: teacher)));
+                        },
                         child: Column(
                           children: [
                             Icon(
@@ -259,22 +437,22 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                       )
                     ],
                   ),
-                  // SizedBox(
-                  //   height: 300,
-                  //   child: _controller.value.isInitialized
-                  //       ? FlickVideoPlayer(
-                  //           flickManager: flickManager,
-                  //           flickVideoWithControls:
-                  //               const FlickVideoWithControls(
-                  //             videoFit: BoxFit.fitHeight,
-                  //             controls: FlickPortraitControls(),
-                  //           ),
-                  //         )
-                  //       : const Center(
-                  //           child: CircularProgressIndicator(
-                  //           color: Colors.grey,
-                  //         )),
-                  // ),
+                  SizedBox(
+                    height: 300,
+                    child: videoLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                            color: Colors.grey,
+                          ))
+                        : FlickVideoPlayer(
+                            flickManager: flickManager,
+                            flickVideoWithControls:
+                                const FlickVideoWithControls(
+                              videoFit: BoxFit.fitHeight,
+                              controls: FlickPortraitControls(),
+                            ),
+                          ),
+                  ),
                   Text(
                     'Languages',
                     style: LettutorFontStyles.headerTeacherDetail,
@@ -373,6 +551,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                             initialDate = DateTime.now();
                             print('New inital: ' + initialDate.toString());
                           });
+                          getListScheduleInWeek();
                         },
                         child: Text('Today'),
                       ),
@@ -380,10 +559,14 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                         onPressed: () {
                           var newInitalDate =
                               initialDate.subtract(const Duration(days: 7));
-                          if (newInitalDate.isBefore(DateTime.now()) == false) {
+
+                          if ((newInitalDate.millisecondsSinceEpoch -
+                                  DateTime.now().millisecondsSinceEpoch) >
+                              -3600 * 24 * 1000) {
                             setState(() {
                               initialDate = newInitalDate;
                             });
+                            getListScheduleInWeek();
                           }
                         },
                         child: Icon(
@@ -397,6 +580,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                             initialDate =
                                 initialDate.add(const Duration(days: 7));
                           });
+                          getListScheduleInWeek();
                         },
                         child: Icon(
                           Icons.chevron_right,
@@ -413,6 +597,9 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                       child: BookingTable(
                         initialDate: initialDate,
                         teacherSchedule: bookingSchedule,
+                        callBack: () {
+                          getListScheduleInWeek();
+                        },
                       ),
                     ),
                   )
@@ -427,7 +614,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
       children: [
         Text(
           tdc.name ?? "",
-          style: LettutorFontStyles.h5Text,
+          style: LettutorFontStyles.h5Title,
         ),
         TextButton(
             onPressed: () {

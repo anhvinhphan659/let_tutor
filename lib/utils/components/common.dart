@@ -247,9 +247,12 @@ class _LettutorAppBarState extends State<LettutorAppBar> {
 
 Widget LettutorContainer({
   required Widget body,
+  bool isLogin = true,
 }) {
   return Scaffold(
-    appBar: LettutorAppBar(),
+    appBar: LettutorAppBar(
+      isLogin: isLogin,
+    ),
     endDrawer: Builder(
       builder: (context) => GestureDetector(
         onTap: () {

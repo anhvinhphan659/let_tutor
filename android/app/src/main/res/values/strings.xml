@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LetTutor</string>
+    <string name="facebook_app_id">549518610483703</string>
+    <string name="fb_login_protocol_scheme">fb549518610483703</string>
+    <string name="facebook_client_token">103405f64380639758305a58b7665fcd4441c21787cb8b5b6da8baf1ac6ccf01</string>
+</resources>

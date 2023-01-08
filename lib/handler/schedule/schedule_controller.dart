@@ -98,7 +98,6 @@ class ScheduleController {
             if (k.toString().contains("MeetingLink")) {
               continue;
             }
-            print(k + ":" + d[k]);
           }
         }
       }
@@ -181,8 +180,39 @@ class ScheduleController {
     );
 
     if (respond.statusCode == 200) {
-      return respond.data as int;
+      return respond.data['total'] as int;
     }
     return 0;
+  }
+
+  static Future<void> cancelBookedClass(String scheduleDetailId,
+      {int cancelReasonID = 1}) async {
+    String requestUrl = "$baseUrl$_bookingPath/schedule-detail";
+    Response respond = await ApiHandler.handler.delete(
+      requestUrl,
+      data: {
+        "scheduleDetailId": scheduleDetailId,
+        "cancelInfo": {
+          "cancelReasonId": cancelReasonID,
+        }
+      },
+      options: ApiHandler.getHeaders(),
+    );
+    if (respond.statusCode == 200) {
+      print("Success");
+    }
+    print("Failed");
+  }
+
+  static Future<bool> updateStudentRequest(String bookingID,
+      {String request = ""}) async {
+    String requestUrl = "$baseUrl$_bookingPath/student-request/$bookingID";
+    Response respond = await ApiHandler.handler.post(
+      requestUrl,
+      data: {"studentRequest": request},
+      options: ApiHandler.getHeaders(),
+    );
+    if (respond.statusCode == 200) return true;
+    return false;
   }
 }

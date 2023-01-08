@@ -29,8 +29,8 @@ class TeacherSchedule {
     endTimestamp = json['endTimestamp'];
     createdAt = json['createdAt'];
     isBooked = json['isBooked'];
+    scheduleDetails = <ScheduleDetail>[];
     if (json['scheduleDetails'] != null) {
-      scheduleDetails = <ScheduleDetail>[];
       json['scheduleDetails'].forEach((v) {
         scheduleDetails!.add(new ScheduleDetail.fromJson(v));
       });
@@ -65,6 +65,18 @@ class TeacherSchedule {
     }
 
     return res;
+  }
+
+  bool isReversedClass() {
+    if (scheduleDetails != null && scheduleDetails!.isNotEmpty) {
+      var scheduleDetail = scheduleDetails![0];
+      for (var booking in scheduleDetail.bookingInfo ?? <BookingInfo>[]) {
+        if ((booking.isDeleted ?? true) == false) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   List<String> getListScheduleId() {
